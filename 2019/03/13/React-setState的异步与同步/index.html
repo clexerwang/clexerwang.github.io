@@ -1,0 +1,94 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><title>React-setState的异步与同步</title><link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/main.css"><link rel="shortcut icon" href="/img/favicon.png"></head><body><header class="base-menu"><div class="menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav></div></header><header class="base-mobile-menu"><div class="mobile-menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav><div id="mobile-menu-toggle" class="toggle-menu"><span class="menu-bar"></span><span class="menu-bar"> </span><span class="menu-bar"></span></div></div></header><div class="base-content"><div class="base-content-main"><article class="article-main"><h1 class="article-title">React-setState的异步与同步</h1><div class="article-meta"><p class="meta-item meta-time"><span class="meta-item-title">发表于: </span>2019-03-13</p><p class="meta-item meta-category"></p></div><div class="article-content"><p>学习setState的目的：</p>
+<blockquote>
+<p>搞清楚它到底是同步还是异步的。</p>
+</blockquote>
+<p>这个问题的起因是在不同的情况下会发现setState的表现大相径庭，所以就有必要搞明白在执行了setState时，它到底干了什么。</p>
+<p>执行setState的情况有以下几种：</p>
+<blockquote>
+<p>一、在事件处理程序中执行setState</p>
+</blockquote>
+<blockquote>
+<p>二、在生命周期中执行setState</p>
+</blockquote>
+<blockquote>
+<p>三、在异步函数中执行setState</p>
+</blockquote>
+<blockquote>
+<p>四、setState的参数为函数类型/Object</p>
+</blockquote>
+<p>上面这四种情况还可以组合出其他的情况，但是在理解了原理后，面对其他的组合情况也可以得到正确的结果。</p>
+<p>###1. 在事件处理程序中执行setState</p>
+<p>####1.1在react合成事件中<br>react有自己的一套事件机制，它使用事件委托将所有的事件监听函数绑定在了document对象上，并通过节点的<code>__reactEventHandlers</code>属性存储对应的事件处理函数。</p>
+<p>当鼠标点击了某个按钮时，在document上会触发click事件，在监听函数中根据event.target找到事件的目标元素，再从目标元素的<code>__reactEventHandlers</code>上取出对应的事件处理函数并执行。</p>
+<hr>
+<p>在合成事件中如果触发了click事件，那么函数的调用栈如下图所示：</p>
+<p>在interactiveUpdates函数中有一个try-finall块，会先执行try中的代码，再执行finally中的代码。<br><img src="./未命名文件 1.png" alt="Alt text"></p>
+<p>图中的<code>callCallback</code>就是事件处理函数。</p>
+<p>可以看到requestWork函数决定着是否要执行后面的更新state流程。<br>requestWork函数：</p>
+<pre><code>function requestWork(root, expirationTime) {
+    addRootToSchedule(root, expirationTime);
+
+    if (isRendering) {
+        return;
+    }
+
+if (isBatchingUpdates) {
+    // Flush work at the end of the batch.
+    if (isUnbatchingUpdates) {
+        // ...unless we&apos;re inside unbatchedUpdates, in which case we should
+        // flush it now.
+        nextFlushedRoot = root;
+        nextFlushedExpirationTime = Sync;
+        performWorkOnRoot(root, Sync, false);
+    }
+    return;
+}
+
+    if (expirationTime === Sync) {
+        performSyncWork();
+    } else {
+        scheduleCallbackWithExpiration(expirationTime);
+    }
+}
+</code></pre><p><code>isRendering</code>，<code>isBatchingUpdates</code>，<code>isUnbatchingUpdates</code>它们是全局的变量。其中<code>isBatchingUpdates</code>，<code>isUnbatchingUpdates</code>的初始值为false。</p>
+<p>在合成事件中<code>isRendering</code>的值为false，而<code>isBatchingUpdates</code>在<code>interactiveUpdates函数</code>中会被设置为true，这就导致了在这里会直接返回。此时会返回到<code>callCallback函数</code>中，这就相当于完成了本次的<code>setState函数</code>，而<code>setState</code>所做的只是创建了一个<code>update</code>，并把这个<code>update</code>加入到了<code>enqueueUpdate</code>中。<br>接下来会继续执行<code>callCallback函数</code>中的其他代码，真正更新state的操作都在的finally代码块中。<br>在执行完<code>callCallback函数</code>后相当于完成了try中的代码，接着就要开始执行finally中的代码，完成的state的更新并渲染UI了。</p>
+<p>由此可知，在合成事件中：</p>
+<blockquote>
+<p>setState表现为’异步’，即执行完setState后不能立即得到最新值。</p>
+</blockquote>
+<p>####1.2 在原生事件中<br>在原生事件中执行setState时，不会有合成事件的相关函数，此时isRender为false，isBatchingUpdates为false，isUnbatchingUpdates也为false。那么在requestWork中直接执行了<code>performSyncWork</code>，同步的更新state。</p>
+<p>所以在原生事件中：</p>
+<blockquote>
+<p>setState表现为’同步’，即执行完setState后可以立即得到最新值。</p>
+</blockquote>
+<p>####1.3在生命周期函数中<br>这里要介绍一下<code>isrender</code>，<code>isWorking</code>，<code>isCommitting</code>这三个全局变量。<br><code>react@16</code>版本采用了<code>Fiber</code>架构(具体的信息可以看：)，react的更新有两个阶段：<code>reconclier</code>和<code>commit</code>。这三个变量在不同的阶段会有不同的值：</p>
+<blockquote>
+<p>isRender：当react开始进行更新时，变为true<br>isWorking：进入reconclier阶段时，变为true<br>isCommitting：进入commit阶段时，变为true</p>
+</blockquote>
+<p>在执行<code>render方法</code>之前的阶段属于reconclier阶段，在执行<code>render方法</code>之后属于commit阶段。</p>
+<blockquote>
+<p>setState的调用栈在上面的图中，从setState开始，一直到结束</p>
+</blockquote>
+<p>可以看到在执行<code>requestWork函数</code>之前会执行<code>scheduleWork函数</code>，而在scheduleWork函数中有如下判断：</p>
+<pre><code>if (
+    //通过isWorking和isCommitting来判断当前所处的阶段。
+    !isWorking ||
+    isCommitting ||
+    //除非要更新的节点不是当前节点
+    nextRoot !== root
+) {
+    const rootExpirationTime = root.expirationTime;
+    requestWork(root, rootExpirationTime);
+}
+</code></pre><p>也就是说在<code>reconlicer阶段</code>不会执行<code>requestWork</code>、在<code>render函数</code>中使用setState也不会执行<code>requestWork</code>、在<code>commit阶段</code>会执行<code>requestWork</code>但由于此时<code>isRendering</code>为<code>true</code>,不会立即进行state的更新，只会执行<code>addRootToSchedule</code>用来添加一个新的更新任务，等当前更新任务完成后执行。</p>
+<p>所以在生命周期函数中：</p>
+<blockquote>
+<p>setState表现为’异步’，即执行完setState后不能立即得到最新值。</p>
+</blockquote>
+<blockquote>
+<p>但在render之后的生命周期函数中执行setState，会添加一个新的更新任务，在当前的更新任务完成后，会开始新的更新任务。</p>
+</blockquote>
+<p>####1.4 在setTimeout<br>由于 <code>setTimeout(()=&gt; { this.setState()}, 0)</code> 是在 try 代码块中,当try 代码块执行到 setTimeout 的时候，会把它丢到任务列队中，然后执行 finally 代码块，等 finally 执行完成后， isBatchingUpdates 又变为了 false ，导致最后去执行任务队列里的 setState 时候， requestWork 走的是和原生事件一样的 <code>expirationTime === Sync if</code>分支，所以表现就会和原生事件一样，可以同步拿到最新的state值。</p>
+<p>现在回答开头的问题，setState的执行是同步的，分为两步：<br>1.先把更新加入更新队列；2.执行更新队列更新state；<br>但是由于setState所处的环境的不同会导致1，2步不能连续的执行，所以就导致了有时候state的不能立即更新。</p>
+</div></article><div id="base-discus"></div></div></div><footer class="base-footer"><div class="footer-wrapper"><span>___ Using </span><a href="https://github.com/chuguixin/Simple"><span>Simple</span></a><span> Presents For You.</span></div></footer><div class="dom-ready"><script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script><script src="/js/base.js"></script></div></body></html>

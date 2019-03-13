@@ -1,0 +1,111 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><title>Javascript-对象创建</title><link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/main.css"><link rel="shortcut icon" href="/img/favicon.png"></head><body><header class="base-menu"><div class="menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav></div></header><header class="base-mobile-menu"><div class="mobile-menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav><div id="mobile-menu-toggle" class="toggle-menu"><span class="menu-bar"></span><span class="menu-bar"> </span><span class="menu-bar"></span></div></div></header><div class="base-content"><div class="base-content-main"><article class="article-main"><h1 class="article-title">Javascript-对象创建</h1><div class="article-meta"><p class="meta-item meta-time"><span class="meta-item-title">发表于: </span>2019-03-13</p><p class="meta-item meta-category"></p></div><div class="article-content"><p>####创建对象的几种模式：</p>
+<p>#####工厂模式</p>
+<p>#####构造函数模式</p>
+<p>#####原型模式</p>
+<p>#####组合使用构造函数和原型模式</p>
+<p>#####动态原型模式</p>
+<p>#####寄生构造函数模式</p>
+<p>#####稳妥构造函数模式<br><code></code><br>首先是最原始的,使用new Object()创建对象。</p>
+<pre><code>var person=new Object();
+person.name=&quot;wang&quot;;
+person.age=1;
+person.sex=&quot;male&quot;;
+</code></pre><p>此外，还有一个简洁版的使用对象字面量创建对象：</p>
+<pre><code>var person={
+            name:&quot;wang&quot;,
+            age:1,
+            sex:&quot;male&quot;
+            };
+</code></pre><p>这些方法当在需要创建大量对象时，太麻烦。<br>之后就有出现了“<b style="color:red">工厂模式</b>”，思路是：用函数来封装上面那些创建对象的过程，并返回创建的对象。</p>
+<pre><code>function createPerson(name,age,sex){
+    var sample=new Object();
+    sample.name=name;
+    sample.age=age;
+    sample.sex=sex;
+    return sample;
+}
+var person1=createPerson(&quot;wang&quot;,1,&quot;male&quot;);
+</code></pre><p>这个方法可以根据接收到的参数来大量创建重复的对象，但是却不能区分创建出来对象的类型。即，检测这个例子中返回的对象都是Object。</p>
+<p>后来出现了“<b style="color:red">构造函数模式</b>”思路是：自己定义一种新的构造函数，创建一种新的类型。</p>
+<pre><code>function Person(name,age,sex){
+    this.name=name;
+    this.age=age;
+    this.sex=sex;
+    this.sayName=function(){
+        alert(this.name);
+    }
+}
+var person = new Person(&quot;name&quot;,1,&quot;male&quot;);
+var person2=new Person(&quot;name&quot;,1,&quot;male&quot;);
+console.log(person2 instanceof Person);     //true
+console.log(person.sayName == person2.sayName) //false
+</code></pre><p>注意，此时person和person2中的sayName方法并不是公用的。<br>这个模式创建的对象可以标注出新的类型，而不仅仅是归于Object中。<br>但是，构造函数模式也有不足，那就是每创建一个实例，构造函数中的方法就要重新创建一次。<br>然后就想可以把构造函数中的方法提取出来</p>
+<pre><code>function Person(name,age,sex){
+    this.name=name;
+    this.age=age;
+    this.sex=sex;
+    this.sayName=sayName;
+}
+function sayName(){
+    alert(this.name);
+}
+var person = new Person(&quot;name&quot;,1,&quot;male&quot;);
+var person2 = new Person(&quot;name&quot;,1,&quot;male&quot;);
+console.log(person.sayName == person2.sayName) //true
+</code></pre><p>注意，此时person和person2中的sayName方法是公用的。<br>但如果对象有多个方法，那么就要定义多个全局函数，这很麻烦，因此又有了“<b style="color:red">原型模式</b>”。<br>我们创建的每个函数都有一个 prototype属性，这个属性指向它的“原型对象”，原型对象中保存的是这个类型的函数所有实例共享的属性和方法。因此可以不用在构造函数中定义实例的信息，而是直接将这些信息全都放入对应的对象原型中。</p>
+<pre><code>function Person(){}；
+Person.prototype.name=&quot;wang&quot;;
+Person.prototype.age=1;
+Person.prototype.sex=&quot;male&quot;;
+Person.prototype.sayName=function(){
+    alert(this.name);
+    } 
+</code></pre><p>实例中的属性可以屏蔽原型对象中的属性。<br>但是，在为原型对象添加属性和方法时，每次都要写Person.prototype这样很麻烦，然后可以用对象字面量统一来进行添加</p>
+<pre><code>function Person(){}
+Person.prototype={
+    name=&quot;wang&quot;,
+    age=1,
+    sex=&quot;male&quot;,
+    sayName=function(){
+        alert(this.name);
+    }
+</code></pre><p>这个也叫作原型重写。<br>同样，原型模式也有缺点，首先它省略了为构造函数传递初始化参数这一环节，因此它创建的对象全都完全一样。此外，在原型对象中包含引用类型的值的属性被实例所共享，因此实例间就会互相影响，为此，就有了“<b style="color:red">组合使用构造函数模式与原型模式</b>”<br>这是创建对象最常用的方法。在构造函数中加入不想要被共享的属性，在原型对象中加入需要被共享的属性和方法。<br>还有一种“<b style="color:red">动态原型模式</b>”<br>它实质上就是在构造函数中判断是否需要修改构造函数的原型对象。<br>它先使用构造函数模式，把所需要的属性添加在构造函数中，之后根据需要来决定是否在构造函数的原型对象中添加所需的方法或属性。</p>
+<pre><code>function Person(name,age,sex){
+    this.name=name;
+    this.age=age;
+    this.sex=sex;
+    if(typeof this.sayName !== &quot;function&quot;)
+        Person.prototype.sayName=function(){
+                alert(this.name);
+        }
+    }
+</code></pre><p>还有一种叫做“<b style="color:red">寄生构造函数模式</b>”<br>它的表面看起来想构造函数模式，但不同之处是它重写了函数的返回值。<br>同时它也有些像工厂模式，不同之处是它将创建对象的过程封装在构造函数中（该函数的调用必须按照构造函数的形式调用，即new），而工厂模式只是封装在一个普通的函数中。 </p>
+<pre><code>function Person(){
+    var o=new Object();     
+    o.name=name;
+    o.age=age;
+    o.sayName=function(){
+            alert(this.name);
+    }
+    return o;
+}
+</code></pre><p> 一般用来创建特殊的原生对象。顾名思义,“寄生”，就是依附在原生的对象上，再添加自己所需要的方法或者属性，同时不改变原生的构造函数。<br>一些解释：在寄生构造函数模式中，上面例子中的Person构造函数它只起一个封装的作用，与构造函数模式中的作用不同。它最终返回的还是函数内部所使用的类型的实例。而构造函数模式返回的是自己的实例。（一般构造函数没有return时，默认返回其对应的实例，但是在寄生构造函数模式中写出了return的返回值，这就改变了构造函数的返回值。所以最终返回的还是一个Object对象。）</p>
+<pre><code>function createAnotherArray(){
+            var o=new Array();
+            //添加方法
+            o.newMethod=function(){return o.reverse;};
+            return o;
+            }
+</code></pre><p>在这个例子中创建了一个拥有新方法newMethod的数组实例。寄生构造函数模式的不足是返回的实例与构造函数之间没有关系，因为在构造函数中，如果不加return就默认返回构造函数的实例，但是在寄生构造函数模式中，由于添加了return语句，重写了构造函数的返回值（返回的是一个其它类型的实例）。<br>“<b style="color:red">稳妥构造函数模式</b>”<br>稳妥对象：指没用公共属性，其方法也不引用this的对象，适合在一些安全性要求比较高的地方使用。与“寄生构造函数模式”类似，但是它的方法不引用this，同时不使用new操作符调用构造函数</p>
+<pre><code>function Person(name,age,sex){
+    var o=new Object();
+    o.name=name;
+    o.age=age;
+    o.sex=sex;
+    o.sayName=function(){
+        alert(name);
+    }
+return o;
+}
+</code></pre></div></article><div id="base-discus"></div></div></div><footer class="base-footer"><div class="footer-wrapper"><span>___ Using </span><a href="https://github.com/chuguixin/Simple"><span>Simple</span></a><span> Presents For You.</span></div></footer><div class="dom-ready"><script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script><script src="/js/base.js"></script></div></body></html>

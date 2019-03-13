@@ -1,0 +1,79 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><title>JS杂录</title><link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/main.css"><link rel="shortcut icon" href="/img/favicon.png"></head><body><header class="base-menu"><div class="menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav></div></header><header class="base-mobile-menu"><div class="mobile-menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav><div id="mobile-menu-toggle" class="toggle-menu"><span class="menu-bar"></span><span class="menu-bar"> </span><span class="menu-bar"></span></div></div></header><div class="base-content"><div class="base-content-main"><article class="article-main"><h1 class="article-title">JS杂录</h1><div class="article-meta"><p class="meta-item meta-time"><span class="meta-item-title">发表于: </span>2019-03-13</p><p class="meta-item meta-category"></p></div><div class="article-content"><p>####运算符<br><code>+</code>号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。<br>eg：    </p>
+<pre><code>var str = +[];
+console.log(str);    //0
+
+var str = !+[]+[]+![];
+//!+[]先进行转换，变为!0
+//![]转换为0
+//则
+console.log(str);    //truefalse
+</code></pre><p>参考文章：<a href="http://justjavac.com/javascript/2012/12/20/object-plus-object.html" target="_blank" rel="noopener">http://justjavac.com/javascript/2012/12/20/object-plus-object.html</a></p>
+<p>####连等赋值问题<br>问题：</p>
+<pre><code>var a ={n:1};
+var b = a;
+a.x = a = {n:2};
+</code></pre><p>问此时a和b的值是什么？</p>
+<p>js中在编译阶段，当程序运行到a.x = a = {n:2} 时，首先会变成这样：</p>
+<pre><code>(a.x = (a = {n:2}))
+</code></pre><p>之后进行赋值，赋值时需要取左值与右值，这时变为：</p>
+<pre><code>({n:1}对象的x属性的左值 = (a的左值 = {n:2}));  
+//这里{n:1}即为a的右值
+//之后开始赋值
+//{n:2}把值赋给a的左值，此时 a = {n:2}，然后返回{n:2}
+//之后{n:2}再把值赋给{n:1}对象的x属性的左值
+//全部过程为
+a = {n:2};
+{n:1}.x = {n:2};
+</code></pre><p>####JS中精度丢失的问题<br>JS使用IEEE 754 双精度 64 位浮点数来存储数值，其格式为：1位符号位，11位指数位，52位尾数位。因而对于小数和大整数就存在精度丢失的问题。<br>eg：</p>
+<pre><code>0.1+0.2 == 0.3; //false
+9999999999999999 == 10000000000000000; //true
+</code></pre><p><b>小数精度丢失</b>:<br>首先要知道0.1和0.2是怎么以64位二进制来表示的：<br>    0.0001 1001 1001 1001 1001(1001)······<br>    0.0011 0011 0011 0011 0011(0011)······<br>采用科学记数法表示后为：<br>    1.1001 1001 1001 1001 1001····(小数后一共52位) <em>2^-4<br>    1.1001 1001 1001 1001 1001····(小数后一共52位) </em>2^-3</p>
+<p>之后进行加法运算：<br>需要把较小的数的指数位变成与加大的数相同<br>即把0.1变成：<br>    0.1100 1100 1100 1100 1100 ····(小数后一共52位) <em>2^-3<br>然后进行与0.2进行加法运算，得到：<br>    10.0110 0110 0110…001 </em> 2^-3<br>    等价于：<br>    0.0100 1100 1100 11…001<br>    转换为十进制为：<br>    0.30000000000000004</p>
+<p>得出一个结论：<b>当十进制小数的二进制表示的有限数字不超过 52 位时，在 JavaScript 里是可以精确存储的。</b></p>
+<p><b>大整数的精度丢失</b><br>我们知道JS中最大值为：符号位取1，52 位尾数位全填充 1, 11位指数位全为1。<br>这个问题与 MAX_VALUE 没什么关系，还得归属到尾数只有 52 位上来。<br>当值小于等于 2^53 时，可以确保精度不会丢失。当值大于 2^53 时，精度就有可能会丢失。</p>
+<p>####一道综合性的面试题</p>
+<pre><code>function Foo() { 
+    getName = function () { 
+        alert (1); 
+        }; 
+    return this; 
+} 
+Foo.getName = function(){alert(2)}; 
+Foo.prototype.getName = function(){alert(3)}; 
+var getName = function(){alert(4)}; 
+function getName(){alert(5)} 
+//请写出以下输出结果： 
+Foo.getName(); //第一题
+getName(); //第二题
+Foo().getName(); //第三题
+getName(); //第四题
+new Foo.getName(); //第五题
+new Foo().getName(); //第六题
+new new Foo().getName();//第七题
+</code></pre><p>答案为：</p>
+<pre><code>Foo.getName();  //2
+这里将Foo看作为一个函数对象，所以执行的就是函数对象的getName方法：Foo.getName = function(){alert(2)}; 
+
+
+getName(); //4
+这里主要为变量声明提升的问题，首先函数声明的优先度大于变量的声明，所以先进行了函数getName的声明，同时后续对于相同变量的声明会被忽略，所以接下来对变量getName的声明被忽略了。等进行到赋值阶段，getName被赋值为function(){alert(4)},所以结果为4。
+
+Foo().getName();  //1
+先执行Foo(),在Foo函数中对全局变量getName进行了赋值，并返回了this。由于Foo函数是直接执行的，所以函数中的this默认指向全局，则要执行全局环境中的getName。
+
+
+getName();  //1
+上一步已经改变了全局环境中的getName
+
+
+new Foo.getName();  //2
+即执行Foo.getName
+
+new Foo().getName(); //3
+结构为(new Foo()).getName(),先执行new Foo(),返回一个Foo的实例，之后要执行实例的getName属性，所以先从实例中找是否有getName属性，很明显Foo构造函数中没有getName属性，那么就要从Foo的原型对象中找，即Foo.prototype.getName
+
+
+new new Foo().getName();//3
+结构为 new ((new Foo()).getName)(),先执行new Foo(),返回Foo实例，然后遇上一个问题相同，在原型链中寻找getName方法，并执行。
+</code></pre></div></article><div id="base-discus"></div></div></div><footer class="base-footer"><div class="footer-wrapper"><span>___ Using </span><a href="https://github.com/chuguixin/Simple"><span>Simple</span></a><span> Presents For You.</span></div></footer><div class="dom-ready"><script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script><script src="/js/base.js"></script></div></body></html>

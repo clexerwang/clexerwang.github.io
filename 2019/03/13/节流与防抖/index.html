@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><title>节流与防抖</title><link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/main.css"><link rel="shortcut icon" href="/img/favicon.png"></head><body><header class="base-menu"><div class="menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav></div></header><header class="base-mobile-menu"><div class="mobile-menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav><div id="mobile-menu-toggle" class="toggle-menu"><span class="menu-bar"></span><span class="menu-bar"> </span><span class="menu-bar"></span></div></div></header><div class="base-content"><div class="base-content-main"><article class="article-main"><h1 class="article-title">节流与防抖</h1><div class="article-meta"><p class="meta-item meta-time"><span class="meta-item-title">发表于: </span>2019-03-13</p><p class="meta-item meta-category"></p></div><div class="article-content"><p>#节流与防抖<br>对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。</p>
+<p>####函数防抖：<br>对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。<br>eg:</p>
+<pre><code>window.onscroll = setDebouncing();//返回一个事件处理函数
+
+function setDebouncing(){
+    var timer = null;       //首次执行，设置句柄。
+    return function(){      //事件处理程序
+        clearTimeout(timer); //每次执行都会清除上次设置的定时器，防止频繁执行。
+        timer = setTimeout(function(){
+                        console.log(&apos;this is debouncing&apos;);
+                        },1000)
+            }            
+    }
+</code></pre><p>上面的函数可以保证最终一定会执行至少一次事件处理程序。</p>
+<p>更进一步：可以更改为事件第一次触发时立即执行事件处理程序，之后不可以触发。。<br>eg：</p>
+<pre><code>window.onscroll = setDebouncing(deal,immediate);//传入事件处理程序
+
+function setDebouncing(func){
+        var timer = null;
+        var doNow;
+        return function(){
+            clearTimeout(timer); //先清除上次的定时器
+            //如果要先立即执行
+            if(immediate){
+                doNow = !timer; //如果之前还没有设置定时器，即第一次触发事件处理程序，这时timer为null，doNow为true。
+                timer = setTimeout(function(){
+                    timer = null;
+                },1000);
+                if(doNow)
+                func();
+            }else{
+                timer = setTimeout(func,1000);
+            }                
+        }
+    }
+</code></pre><p>####函数节流：<br>是指每隔一段时间执行一次函数，比如页面一直在触发scroll事件，函数节流用来规定每隔固定时间执行一次事件处理程序。<br>它有两种实现方式：时间戳，定时器。<br><b>时间戳：</b><br>eg：</p>
+<pre><code>window.onscroll = setThrottle(func,interval);//传入事件处理程序和时间间隔
+
+function setThrottle(func,interval){
+    var nowTime = Date.now();//获得当前时间
+    return function(){
+        if(Date.now() - nowTime &gt;= interval){
+            func();
+            nowTime = Date.now();
+        }
+    }
+}
+</code></pre><p><b>定时器：</b><br>eg：</p>
+<pre><code>window.onscroll = setThrottle(func,interval);
+
+function setThrottle(func,interval){
+    var timer;
+    return function(){
+        if(!timer){   //判断当前是否已经设置了定时器，如果设置了定时器则忽略之后的定时器，直到设置的定时器执行之后，再将句柄设置为null。
+            timer = setTimeout(function(){
+                                func();
+                                timer = null;
+                                  },interval);
+                }
+           }
+} 
+</code></pre><p><b>综合使用时间戳和定时器：</b><br>可以在第一次触发时立即执行一次函数，并在最后再执行一次函数的函数节流。<br>eg：</p>
+<pre><code>window.onscroll = setThrottle(func,interval);
+
+function setThrottle(func,interval){
+   var startDate = Date.now(); //绑定事件的时候
+   var timer = null;
+   return function(){
+            clearTimeout(timer);
+            var nowDate = Date.now(); //事件触发的时间
+            //如果事件触发时已经超过了预期的时间间隔，则可以立即执行函数
+            if(interval - (nowDate - startDate)&lt;= 0){
+                    func();
+                    startDate = Date.now();//更新时间
+            }else{
+                //如果小于预期的时间间隔，则设置定时器
+                timer = setTimeout(func,interval - (nowDate - startDate))
+            }
+        }
+}
+</code></pre></div></article><div id="base-discus"></div></div></div><footer class="base-footer"><div class="footer-wrapper"><span>___ Using </span><a href="https://github.com/chuguixin/Simple"><span>Simple</span></a><span> Presents For You.</span></div></footer><div class="dom-ready"><script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script><script src="/js/base.js"></script></div></body></html>

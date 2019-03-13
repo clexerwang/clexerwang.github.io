@@ -1,0 +1,229 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><title>Promise的实现</title><link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/main.css"><link rel="shortcut icon" href="/img/favicon.png"></head><body><header class="base-menu"><div class="menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav></div></header><header class="base-mobile-menu"><div class="mobile-menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav><div id="mobile-menu-toggle" class="toggle-menu"><span class="menu-bar"></span><span class="menu-bar"> </span><span class="menu-bar"></span></div></div></header><div class="base-content"><div class="base-content-main"><article class="article-main"><h1 class="article-title">Promise的实现</h1><div class="article-meta"><p class="meta-item meta-time"><span class="meta-item-title">发表于: </span>2019-03-13</p><p class="meta-item meta-category"></p></div><div class="article-content"><p>####Promise/A+规范<br><a href="http://www.ituring.com.cn/article/66566" target="_blank" rel="noopener">http://www.ituring.com.cn/article/66566</a></p>
+<p>#####规范总结：</p>
+<pre>
+1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。
+
+2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rejected时会调用onRejected函数，且会传入promise的错误原因。
+注意：终值与错误原因都是不可变值，即前后需要满足‘===’；
+
+3、关于promise2 = promise1.then(onFulfilled, onRejected); 
+      promise3 = promise2.then(onFulfilled, onRejected);
+<pre>
+3-1、不管promise1执行了onFulfilled还是onRejected，promise2的状态都会是fulfilled，除非promise1报错则promise2状态会变为rejected并执行onRejected。
+
+3-2、不管在onFulfilled还是在onRejected中报错，都不会影响promise1的状态，只会影响promise2的状态；
+
+3-3、如果 onFulfilled 不是函数且 promise1 成功执行， promise2 状态为fulfilled并返回相同的值
+
+3-4、如果 onRejected 不是函数且 promise1 拒绝执行， promise2 状态为rejected并返回相同的据因
+
+对于返回值x：
+3-5、x是promise对象或者thenable对象：
+如果x的状态为pending，则promise2需要等x先执行，直到x的状态发生改变，
+如果x的状态为fulfilled，那么promise2的状态也为fulfilled，且将x的值传入promise2的onFulfilled函数作为参数。
+如果x的状态为rejected，那么promise2的状态也为rejected，且将错误信息传入promise2的onRejected函数作为参数。
+3-6、x是一个普通值，则以 x 为参数执行 promise2
+</pre>
+</pre>
+
+<p>####Promise实现</p>
+<pre><code>let nullFunc = function(){}
+
+//Promise的构造函数
+function Promise(executer){
+  //首先判断executer是否为函数
+  if(!executer instanceof function) throw new TypeError(&apos;TypeError&apos;);
+
+ this.state = &apos;pending&apos;;
+ this.value = null;
+ this.queue = []; //用来保存绑定的子promise
+
+ //先判断executer是否是空函数
+  if(exectuer !== nullFunc)
+//safelyResolveThen用来保证每个promise的状态只能改变一次
+safelyResolveThen(this,exectuer);
+}
+
+
+function safelyResolveThen(promise,itsThen){
+  //通过called来保证每个promise的状态只能更改一次
+  let called = false;
+  let resolve = function(value){
+    if(called) return;
+    called = true;
+    //doResolve函数用来判断传入的value值对promise的影响
+    doResolve(promise,value)
+  }
+  let reject = function(error){
+    if(called) return;
+    called = true;
+    //同doResolve
+    doReject(promise,error);
+  }
+
+  try{
+    //执行then函数。使用try-catch来捕捉错误
+    then(resolve,reject);
+  }catch(error){
+    called = true;
+    doReject(promise,error);
+  }
+}
+
+function doResolve(promise,value){
+  //判断传入的value是否为thenable对象
+  let then = getThen(value);
+  try{
+    //如果是
+    if(then){
+      //这里注意，上面的getThen函数返回的then是使用apply绑定在value自己身上的，并不是当前这个promise的then函数
+      //根据promise/A+规范的规定，如果value是thenable对象，promise要等待value的状态确定后，根据value的状态来确定自己的状态
+      safelyResolveThen(promise,then);
+    }else{
+      //如果value不是thenable对象，那么直接确定promise的状态
+      promise.state = &apos;fulfilled&apos;;
+      promise.value = value;
+      //开始遍历通知绑定在该promise上的子promise，给子promise传value，让子promise改变状态
+      promise.queue.forEach((e)=&gt;{e.callFulfilled(value)});
+    }
+  }catch(error){
+    //如果发生错误
+    doReject(promise,error);
+  }
+}
+
+
+function doReject(promise,error){
+  promise.state = &apos;rejected&apos;;
+  promise.value = error;
+  promise.forEach((e)=&gt;{e.callRejected(error)});//道理同doResolve
+}
+
+//然后是then函数
+Promise.prototype.then = function(onFulfilled,onRejected){
+  //这里是值穿透，如果当前promise以确定状态，但是为传入相应的执行函数，则直接把当前的promise作为then函数的返回值。
+  if(this.state === &apos;fulfilled&apos;&amp;&amp;!onFulfilled instanceof function || this.state === &apos;rejected&apos;&amp;&amp; !onRejected instanceof function) 
+return this;
+
+  //根据promise/A+规定，每个then都要返回新的promise
+  let newPromise = new Promise(nullFunc);
+
+  //根据promise的状态来执行对应的函数
+  if(this.state !== &apos;pending&apos;){
+    let resolver = this.state===&apos;fulfilled&apos;?onFulfilled:onRejected;
+    //异步执行对应的函数,这里需要传入value，因为resolver执行时会自动传入父级promise的值
+    unwrap(newPromise,resolver,this.value);
+  }else{
+this.queue.push(new QueueItem(promise,onFUlfilled,onRejected));
+  }
+  return newPromise;
+}
+
+
+function unwrap(promise,exectuer,value){
+  //异步执行
+  Immediate(function(){
+    let returnValue;
+    try{
+      //执行对应函数
+      returnValue = exectuer(value);
+    }catch(error){
+      //如果出错，则改变promise的状态
+      doReject(promise,error)
+    }
+    //如果返回的是同一个promise，会引起循环引用，报错
+    if(returnValue === promise) throw new TypeError(&apos;TypeError&apos;);
+    else{
+      doResolve(promise,returnValue);
+    }
+  })
+}
+
+function QueueItem(promise,onFulfilled,onRejected){
+  this.promise =promise; //保存promise
+  this.callFulfilled = function(value){
+    doResolve(this.promise,value);
+  }  
+
+  this.callRejected = function(error){
+    doReject(this.promise,error);
+  }
+  //这里如果在then中传入的onFulfilled或onRejected是函数，那么不能立即改变要返回的promise的状态，
+  //需要根据onFulfilled和onRjected的返回值，来确定promise的状态。
+  //即如果onFulfilled和onRjected的返回值是thenable对象，那么就要等待这个thenable对象的状态确定，才能确定要返回的promise的状态
+  if(onFulfilled instanceof function){
+    this.callFulfilled = function(value){
+      unwrap(this.promise,onFulfilled,value);
+    }
+  }
+  if(onRejected instanceof function){
+    this.callRejected = function(error){
+      unwrap(this.promise,onRejected,error);
+    }
+  }
+}
+
+Promise.resolve = function(value){
+  //如果value是promise对象，则直接返回value
+  if(value instanceof this) return value;
+
+  return doResolve(new this(nullFunc),value);
+}
+
+Promise.reject = function(value){
+    return doReject(new this(nullFunc),value); 
+}
+
+Promise.all = function(arrays){
+  //如果arrays不是可迭代对象，直接报错
+  if(!arrays[Symbol.iterator]) throw new TypeError(&apos;TypeError&apos;);
+
+  let called = false;
+  let resolved = 0;
+  let len = arrays.length;
+  if(!len) return this.resolve([]);
+
+  let result = Array(len);
+  let index = 0;
+  let promise = new this(nullFunc);
+  while(index++ &lt;len){
+    this.resolve(arrays[index]).then(function(value){
+      result.push = value;
+      if(++resolved === len&amp;&amp;!called)
+        doResolve(promise,result);
+    },function(error){
+      if(!called){
+        called = true;
+        doReject(promise,error);  
+      }
+    })
+  }
+  return promise;
+}
+
+Promise.race = function(arrays){
+  if(!arrays[Symbol.iterator]) throw new TypeError(&apos;TypeError&apos;);
+
+  let len = arrays.length;
+  if(!len) return this.resolve([]);
+
+  let called = false;
+  let promise = new this(nullFunc);
+  let index =0;
+  while(index++ &lt;len){
+    this.resolve(arrays[i]).then(function(value){
+      if(!called){
+        called = true;
+        doResolve(promise,value);
+      }
+    },function(error){
+      if(!called){
+        called = true;
+        doReject(promise,value);
+      }
+    })
+  }
+  return promise;
+}
+</code></pre></div></article><div id="base-discus"></div></div></div><footer class="base-footer"><div class="footer-wrapper"><span>___ Using </span><a href="https://github.com/chuguixin/Simple"><span>Simple</span></a><span> Presents For You.</span></div></footer><div class="dom-ready"><script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script><script src="/js/base.js"></script></div></body></html>

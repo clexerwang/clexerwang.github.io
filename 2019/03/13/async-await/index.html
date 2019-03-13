@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><title>async/await</title><link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/main.css"><link rel="shortcut icon" href="/img/favicon.png"></head><body><header class="base-menu"><div class="menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav></div></header><header class="base-mobile-menu"><div class="mobile-menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav><div id="mobile-menu-toggle" class="toggle-menu"><span class="menu-bar"></span><span class="menu-bar"> </span><span class="menu-bar"></span></div></div></header><div class="base-content"><div class="base-content-main"><article class="article-main"><h1 class="article-title">async/await</h1><div class="article-meta"><p class="meta-item meta-time"><span class="meta-item-title">发表于: </span>2019-03-13</p><p class="meta-item meta-category"></p></div><div class="article-content"><p>Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是<code>async/await</code>。</p>
+<p>在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。</p>
+<p>###async/await的实现</p>
+<p>####async函数<br>async函数是使用执行器对生成器函数进行了包裹</p>
+<pre><code>async function example(){
+    let content = await readFile(&apos;ex.json&apos;);
+}
+
+就相当于：
+
+function example(){
+    return run(function *(){
+        let content = yield readFile(&apos;ex.json&apos;);
+    })
+}
+</code></pre><p>####内置的执行器<br>在async/await中内置的执行器返回的是Promise对象。</p>
+<p>执行器实现：</p>
+<pre><code>function runMaster(generator){
+    return new Promise(function(resolve,reject){
+        let iterator = generator();
+
+        function step(next){
+            try{
+                let result = next();
+            }catch(e){
+                return reject(e)
+            }
+
+            if(result.done){
+                return resolve(result.value)    
+            }
+
+            //这里Promise.resolve所生成的Promise对象的状态不一定是fulfilled，
+            //因为生成的Promise的状态是根据传入的next.value来决定的
+            //如果next.value是一个状态为pending的Promise对象，那么Promise.resolve返回的也是pendind状态
+            Promise.resolve(next.value).then(function(value){
+                step(iterator.next.bind(iterator,value))
+            }).catch(function(err){
+                step(iterator.next.bind(iterator,value))   
+            })   
+        }
+
+        step(iterator.next.bind(iterator));
+
+    })
+}
+</code></pre><p>现在整体的看一下执行器做了什么。首先执行器会返回一个Promise对象，而Promise对象的状态由内部函数决定。在内部函数中，主要负责循环执行迭代器的next方法，每执行一次就要判断next的返回值。根据返回值的不同执行不同的流程：</p>
+<pre><code>1、返回值报错，直接执行reject，将Promise对象的状态改为rejected并返回。
+
+2、返回值的value为true，表示生成器内部的逻辑已经执行完成，执行resolve，将Promise对象的状态改为fulfilled并返回。
+
+3、返回值的value为false，说明还需要继续执行next方法，那么就生成一个新的fulfilled状态的Promise对象，并将对next方法的调用作为onfulfilled函数放入then中(这样就会将onfulfilled函数放入微任务队列中)，并退出。
+</code></pre><p>###对题目的理解：<br>    async function async1() {<br>        console.log( ‘async1 start’ )<br>        await async2()<br>        console.log( ‘async1 end’ )<br>    }<br>    async function async2() {<br>        console.log( ‘async2’ );<br>        return Promise.resolve();<br>        }<br>    console.log( ‘script start’ )<br>    setTimeout( function () {<br>        console.log( ‘setTimeout’ )<br>    }, 0 )<br>    async1();<br>    new Promise( function ( resolve ) {<br>        console.log( ‘promise1’ )<br>        resolve();<br>    } ).then(function () {<br>        console.log( ‘promise2’ )<br>    } ).then(function () {<br>        console.log( ‘promise3’ )<br>    } )<br>    console.log( ‘script end’ )</p>
+<p>重点就是执行器中的这一句：</p>
+<pre><code>Promise.resolve(next.value).then(function(value){
+                step(iterator.next.bind(iterator,value))
+            }).catch(function(err){
+                step(iterator.next.bind(iterator,value))   
+            })   
+</code></pre><p>开始时我一直以为Promise.resolve()一定会返回一个<code>fulfilled</code>状态的Promise对象。但是实际上是如果向Promise.resolve()中传入了一个Promise对象，那么Promise.resolve()不会对该对象做任何处理直接返回该对象。</p>
+</div></article><div id="base-discus"></div></div></div><footer class="base-footer"><div class="footer-wrapper"><span>___ Using </span><a href="https://github.com/chuguixin/Simple"><span>Simple</span></a><span> Presents For You.</span></div></footer><div class="dom-ready"><script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script><script src="/js/base.js"></script></div></body></html>

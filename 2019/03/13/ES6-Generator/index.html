@@ -1,0 +1,143 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><title>ES6--Generator</title><link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/main.css"><link rel="shortcut icon" href="/img/favicon.png"></head><body><header class="base-menu"><div class="menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav></div></header><header class="base-mobile-menu"><div class="mobile-menu-wrapper"><div class="menu-layout-bg"></div><nav class="menu-content"><ul class="menu-list"><li class="menu-item"><a href="/" class="menu-link">Clexer</a></li><li class="menu-item"><a href="/blog/archives" class="menu-link">Archives</a></li><li class="menu-item"><a href="/about" class="menu-link">About</a></li></ul></nav><div id="mobile-menu-toggle" class="toggle-menu"><span class="menu-bar"></span><span class="menu-bar"> </span><span class="menu-bar"></span></div></div></header><div class="base-content"><div class="base-content-main"><article class="article-main"><h1 class="article-title">ES6--Generator</h1><div class="article-meta"><p class="meta-item meta-time"><span class="meta-item-title">发表于: </span>2019-03-13</p><p class="meta-item meta-category"></p></div><div class="article-content"><p>####Generator与Iterator<br>生成器可以返回一个迭代器对象。迭代器对象拥有next方法，用来返回结果对象。在生成器中可以使用yield关键子来表示迭代器next方法的返回值。</p>
+<p>yield也可以直接应用于字符串：yield *’hello’，之后便会调用字符串默认迭代器。<br><code>不可以用箭头函数来作生成器</code></p>
+<p>####next和throw的传值<br>迭代器的next和throw方法在调用时可以传入参数：<br>在next中传入的参数，会被作为上一次yield的返回值，同时在首次next调用时传入的参数会被忽略：</p>
+<pre><code>function *generator(){
+    let t1 = yield 1;
+    let t2 = yield t1+1
+    yield t2+1
+}    
+let iterator = generator();
+iterator.next(1); //注意在首次next调用时传入的参数会被忽略
+iterator.next(10); //传入10
+iterator.next(); //11
+</code></pre><p>throw方法可以让迭代器恢复执行时抛出错误，传入的参数作为错误信息：<br>如果函数中没有设置可以捕获错误的措施，那么函数在抛出错误后就会停止执行，之后调用的next，throw方法都无效。</p>
+<pre><code>function *generator(){
+    try{
+     //第一次执行next，函数停在yield处，当接着执行throw时，在yield处报错，由于使用了try捕捉错误，所以函数会接着执行到第二个yield处，并返回结果
+        let t1 = yield 1;
+    }catch(error){
+        console.log(t1)        }
+    }
+    yield 2
+}
+let iterator = generator();
+iterator.next();  //value:1,done:false
+iterator.throw(new Error(&apos;wrong&apos;)); //value:2,done:false
+</code></pre><p>在generator中，如果执行next的值是由return返回的，则done被置为true，value为return的返回值。且return之后的任何语句都不会被执行：</p>
+<pre><code>function *generator(){
+    yield 1;
+    return 2;
+    yield 3;
+}
+let iterator = generator();
+iterator.next();  //value:1,done:false
+iterator.next(); //value:2,done:true
+iterator.next(); //value:undefined,done:true
+</code></pre><p>####可迭代对象<br>在ES6中，可迭代对象包括：<code>Array，Map，Set，字符串，nodeList对象</code><br>可迭代对象都有一个内部属性<code>[[Symbol.iterator]]</code>，它存储了可迭代对象的默认生成器，通过执行它可以获得对应的迭代器。</p>
+<p>可以通过该属性来判断对象是否为可迭代对象：<br>当一个对象拥有自己的迭代器时，那么该对象就是一个可迭代对象。<br>而对象的<code>[[Symbol.iterator]]</code>属性中存储的是该对象的生成器，使用生成器就可以获得该对象对应的迭代器，所以可以通过[[Symbol.iterator]]来判断对象是否为可迭代对象。</p>
+<p><code>由生成器创建的迭代器也是一个可迭代对象，它们的[[Symbol.iterator]]属性指向创建它们的生成器。</code></p>
+<p>####展开运算符<br>展开运算符<code>...</code>也是使用了可迭代对象的默认迭代器来取值。所以所有可迭代对象都可以使用展开运算符。</p>
+<p>####for-of方法<br>可迭代对象都可以使用for-of方法，其内部的原理为：</p>
+<pre><code>var arr = [1,2,3,4,5];
+
+//当执行for-of方法时，它会先去查看arr对象的[[Symbol.iterator]]属性，通过概述行获取了对应的迭代器后，就开始循环执行迭代器的next方法：
+//如果next方法的返回值的done属性为false，则将返回值的value属性赋值给every，如果done属性为true，则退出for-of；
+//如果没有该方法则报错
+for(let every of arr){
+    console.log(every);
+}
+</code></pre><p><code>展开运算符和for-of循环都会忽略return语句的返回值，且只要done变为true就立即停止读取值。</code></p>
+<p>####内建迭代器<br>在ES6中设置了3种内建的生成器：<code>entries</code>,<code>values</code>,<code>keys</code>。<br>它们的使用方法：</p>
+<pre><code>var arr = [1,2,3,4];
+var iterator = arr.entries();  //获取迭代器
+iterator.next();               //获取返回值
+</code></pre><p>同时这三种生成器创建的迭代器的next()返回值也有所不同：</p>
+<p>首先迭代器的next()的返回值的结构都相同，都为：</p>
+<pre><code>{
+    value:  ,
+    done:   
+}
+</code></pre><p>但是value属性的值的结构却不相同：</p>
+<pre><code>                value属性
+entries         [键，值]
+values          值
+keys            键
+</code></pre><p>对于集合对象，他们的[[Symbol.iterator]]中都保存有默认的生成器：</p>
+<pre><code>数组：   values
+Set ：   values
+Map：    entries
+</code></pre><p>####基于Generator的异步任务<br>异步任务的意义：<br>对于单线程的JS来说，假如需要读取文件。那么在读取文件时线程一直处于停滞的状态，它需要等文件读取完成后再接着执行下面的任务。所以有了回调函数，将文件读取完成后要做的事放在回调函数中，在读取文件时，线程执行其他任务。当文件读取完成后就将回调放入任务队列，等待执行。<br>而generator可以中断函数执行的特点就非常适合异步任务，当开始读取文件时，就可以中断当前函数的执行，继续去执行其他任务。当文件读取成功时再通过next函数，继续执行中断的函数。</p>
+<p>####generator的异步任务执行器：<br>执行器就是用来连续的调用迭代器的next方法，从而执行生成器中的逻辑。</p>
+<p>而异步执行器所做的也大致相同：<br>1、先调用迭代器的next方法，通过next的返回值判断是否已经执行完了生成器中的逻辑。<br>2、如果没有执行完成那么就判断next的返回值类型。<br>3、如果返回值是函数，说明需要向生成器传入回调函数，在传入回调函数后，执行器的工作就完成了。当异步函数执行完成去调用回调函数时，再在回调函数中判断是否要继续向下执行生成器中的逻辑。<br>4、如果返回值不是函数，那么就和普通的执行器一样，继续向下执行。</p>
+<p>重点就是：将迭代器的next函数放入回调函数中。这样当异步任务执行完去执行回调函数时，就会执行迭代器的next函数。</p>
+<p>生成器：内部是需要异步执行的代码，使用yield和迭代器实现从函数外部控制函数的执行。</p>
+<p>代码实现：</p>
+<pre><code>//生成器，内部为需要异步执行的代码
+function *generator(){
+    //这里的readFile不是原生的异步函数，而是进行了柯里化，具体原因在控制器中会介绍
+    let file = yield readFileCurry(&apos;json.txt&apos;);
+
+    //...其他的处理操作
+}
+
+//异步函数柯里化
+function readFileCurry(filename){
+    return function(callback){
+        readFile(filename,callback);
+    }
+}
+
+//执行器
+function runMaster(generator){
+    //先获取迭代器
+    let iterator = generator();
+
+    //开始生成器内的异步操作,这里返回了一个用来接收回调函数的中间函数
+    let result = iterator.next();
+
+    //前面说过，重点就是把迭代器的next函数放入异步的回调函数中。
+    //很明显，只有在控制器内部才能获得迭代器对象，所以只能在控制器内部才能获取到next函数。
+    //为了把next传给回调函数，那么回调函数只能在控制器内部声明。
+    //所以也就回答了上面的需要把异步函数进行柯里化。
+
+
+    //回调函数的声明
+    function callback(err,data){
+        //先判断异步函数的执行有没有出错
+        if(err){
+            //如果出错了，就把错误信息抛给生成器，让他们自己处理。保存处理的结果。
+            result = iterator.throw(err);
+            return;
+        }
+        //如果异步函数执行没有错误,那当然也要把结果给生成器，让他们接着处理。保存处理的结果。
+        result = iterator.next(data);
+
+
+        step();
+    }
+
+    //现在完成了对回调函数的声明，就可以把回调函数传给中间函数了
+    function step(){
+
+        //如果done为false，说明生成器还没有执行完，要接着执行
+        if(!result.done){
+            //然后通过生成器返回值来确定当前生成器执行到哪里了
+
+            //如果是函数类型，说明现在生成器正等待传入回调函数好开始执行异步函数
+            if(typeof result.value === &apos;function&apos;){
+                //所以传入回调函数,并开始执行异步函数
+                result.value(callback);
+            }else{
+                //如果不是函数类型，说明已经完成了异步函数。
+                //继续执行
+                result = iterator.next(result.value);
+                step();
+            }
+        }
+    }
+
+    //开始整个流程
+    step();
+}
+</code></pre></div></article><div id="base-discus"></div></div></div><footer class="base-footer"><div class="footer-wrapper"><span>___ Using </span><a href="https://github.com/chuguixin/Simple"><span>Simple</span></a><span> Presents For You.</span></div></footer><div class="dom-ready"><script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script><script src="/js/base.js"></script></div></body></html>
