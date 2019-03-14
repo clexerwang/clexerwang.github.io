@@ -12,7 +12,7 @@ if (!!$.prototype.justifiedGallery) {
 
 
 $(document).ready(function() {
-
+  hljs.initHighlightingOnLoad();
   /**
    * Shows the responsive navigation menu on mobile.
    */
@@ -20,6 +20,7 @@ $(document).ready(function() {
     $("#header > #nav > ul").toggleClass("responsive");
   });
 
+  
 
   /**
    * Controls the different versions of  the menu in blog post articles 

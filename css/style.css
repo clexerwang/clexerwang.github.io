@@ -1383,7 +1383,7 @@ article .content .caption {
 pre {
   font-family: "Menlo", "Meslo LG", monospace;
   font-size: 13px;
-  padding: 0px 15px;
+  padding: 0px 0px;
   padding-bottom: 0;
   line-height: 22px;
   -webkit-border-radius: 4px;
@@ -1400,7 +1400,11 @@ code {
 pre code {
   border: none;
   display: block;
-  padding: 0;
+  padding: 0 15px;
+  overflow-x: auto;
+  overflow-y: auto;
+  word-break: keep-all;
+  white-space: pre;
 }
 .highlight {
   font-family: "Menlo", "Meslo LG", monospace;
