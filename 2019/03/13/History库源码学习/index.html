@@ -6,17 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="@(React框架知识点) #history库源码学习history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。 history库中每个location对象都有一个key属性，用来唯一标示location，也有一个state属性用来保存信息">
+    <meta name="description" content="history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。 history库中每个location对象都有一个key属性，用来唯一标示location，也有一个state属性用来保存信息。 createBrowserHistory函数非常长">
 <meta property="og:type" content="article">
 <meta property="og:title" content="History库源码学习">
 <meta property="og:url" content="http://yoursite.com/2019/03/13/History库源码学习/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="@(React框架知识点) #history库源码学习history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。 history库中每个location对象都有一个key属性，用来唯一标示location，也有一个state属性用来保存信息">
+<meta property="og:description" content="history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。 history库中每个location对象都有一个key属性，用来唯一标示location，也有一个state属性用来保存信息。 createBrowserHistory函数非常长">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-13T09:01:56.773Z">
+<meta property="og:updated_time" content="2019-03-13T11:51:16.147Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="History库源码学习">
-<meta name="twitter:description" content="@(React框架知识点) #history库源码学习history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。 history库中每个location对象都有一个key属性，用来唯一标示location，也有一个state属性用来保存信息">
+<meta name="twitter:description" content="history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。 history库中每个location对象都有一个key属性，用来唯一标示location，也有一个state属性用来保存信息。 createBrowserHistory函数非常长">
     
     
         
@@ -56,11 +56,7 @@
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </span>
@@ -98,7 +94,7 @@
 
     </div>
     <div id="toc">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#getDOMLocation"><span class="toc-number">1.</span> <span class="toc-text">getDOMLocation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#createLocation"><span class="toc-number">2.</span> <span class="toc-text">createLocation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#createTransitionManager"><span class="toc-number">3.</span> <span class="toc-text">createTransitionManager</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#handlePopState"><span class="toc-number">4.</span> <span class="toc-text">handlePopState</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#handlePop"><span class="toc-number">5.</span> <span class="toc-text">handlePop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setState"><span class="toc-number">6.</span> <span class="toc-text">setState</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#revertPop"><span class="toc-number">7.</span> <span class="toc-text">revertPop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go"><span class="toc-number">8.</span> <span class="toc-text">go</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#block"><span class="toc-number">9.</span> <span class="toc-text">block</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#listen"><span class="toc-number">10.</span> <span class="toc-text">listen</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -132,13 +128,11 @@
   
 
   <div class="content" itemprop="articleBody">
-    <p>@(React框架知识点)</p>
-<p>#history库源码学习<br>history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。</p>
+    <p>history和location中的各个属性都在描述当前的历史记录。在history库中，也是同样的道理，history库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也提供了一些其他的属性。</p>
 <p>history库中每个location对象都有一个key属性，用来唯一标示location，也有一个state属性用来保存信息。</p>
 <p>createBrowserHistory函数非常长，但是大部分都是声明函数，抛开声明函数，主要做的事情是：判断是否为浏览器环境，判断是否有history对象，生成初始的location对象并返回一个包含应有属性的history对象。</p>
 <p>接下来看一下声明的每个函数的作用：</p>
-<p>###getDOMLocation</p>
-<pre><code>function getDOMLocation(historyState){
+<h2 id="getDOMLocation"><a href="#getDOMLocation" class="headerlink" title="getDOMLocation"></a>getDOMLocation</h2><pre><code>function getDOMLocation(historyState){
     //为要生成的location对象获取key和state
     const {key,state} = historyState;
     //为要生成的location对象获取对应的路径属性值
@@ -147,7 +141,7 @@
     //组合路径
     let path = pathname+search+hash;
     //如果设置了basename，但是路径开头与basename不同，就报错
-    warning( !(basename &amp;&amp; hasBasename ( path, basename )),&apos;wrong&apos;);
+    warning( !(basename &amp;&amp; hasBasename ( path, basename )),&#39;wrong&#39;);
 
     //生成的location对象的的path不能包含basename部分
     if(basename) path = stripBasename(path,basename)
@@ -156,34 +150,34 @@
     return createLocation(path,state,key)
 }
 </code></pre><p>可以看到getDOMLocation主要是为生成location对象作处理参数的工作，每个location对象都有<code>key，state，pathname，search，hash</code>这些属性。<code>key</code>和<code>state</code>就来自于当前html中的history的state中。<code>pathname，search，hash</code>来自于当前html中的location的路径信息中，而且这个路径不包含basename部分。</p>
-<p>###createLocation<br>createLocation函数比较长，不过内容比较简单</p>
+<h2 id="createLocation"><a href="#createLocation" class="headerlink" title="createLocation"></a>createLocation</h2><p>createLocation函数比较长，不过内容比较简单</p>
 <pre><code>function createLocation(path,state,key,currentLocation){
     let location; //新的历史记录的location对象
 
     //如果传入的路径信息不是对象类型，就是用parsePath将它拆成对象形式
-    if(typeof path === &apos;string&apos;){
+    if(typeof path === &#39;string&#39;){
         location = parsePath(path);
         location.state = state;
     }else{
         //如果是对象形式的，直接解构
         location = {...path};
 
-        if(location.pathname === undefined ) location.pathname = &apos;&apos;;
+        if(location.pathname === undefined ) location.pathname = &#39;&#39;;
 
         if(location.search){
-            if(location.search.charAt(0)!== &apos;?&apos;){
+            if(location.search.charAt(0)!== &#39;?&#39;){
                 location.search = ? + location.search;
             }
         }else{
-            location.search = &apos;&apos;;
+            location.search = &#39;&#39;;
         }                
 
         if(location.hash){
-            if(location.hash.charAt(0) !== &apos;#&apos;){
-                location.hash = &apos;#&apos;+location.hash;
+            if(location.hash.charAt(0) !== &#39;#&#39;){
+                location.hash = &#39;#&#39;+location.hash;
             }
         }else{
-            location.hash = &apos;&apos;;
+            location.hash = &#39;&#39;;
         }
         //如果有state，就设置location的state
         if(state !== undefined &amp;&amp; location.state === undefined){
@@ -202,13 +196,13 @@
         if(!location.pathname){
             location.pathname = currentLocation.pathname;
             //如果新的pathname不是以‘/’开头
-        }else if(location.pathname.charAt(0) !== &apos;/&apos;){
+        }else if(location.pathname.charAt(0) !== &#39;/&#39;){
             //根据新的pathname使用resolvePathname计算新的路径
             location.pathname = resolvePathname(location.pathname,currentLocation.pathname)
         }
     }else{
         if(!location.pathname){
-            location.pathname = &apos;/&apos;;
+            location.pathname = &#39;/&#39;;
         }
     }
 
@@ -216,12 +210,12 @@
 
 }
 </code></pre><p>createLocation函数主要就是处理路径的问题，可以看到location对象有pathname，search，hash，key，state这几个属性。</p>
-<p>###createTransitionManager<br>createTransitionManager函数主要是负责对路径变化的监听函数进行管理，它返回一个对象拥有setPrompt，confirmTransitionTo，appendListener，notifyListeners方法，分别用来添加提示信息，管理拦截信息的显示，添加监听路由变化的函数，执行监听函数。</p>
+<h2 id="createTransitionManager"><a href="#createTransitionManager" class="headerlink" title="createTransitionManager"></a>createTransitionManager</h2><p>createTransitionManager函数主要是负责对路径变化的监听函数进行管理，它返回一个对象拥有setPrompt，confirmTransitionTo，appendListener，notifyListeners方法，分别用来添加提示信息，管理拦截信息的显示，添加监听路由变化的函数，执行监听函数。</p>
 <pre><code>function createTransitionManager(){
     let prompt = null;
     //prompt指要显示的提示信息，可以是函数或者字符串类型。
     const setPrompt = function(nextPrompt){
-        warning(prompt == null,&apos;warning&apos;);
+        warning(prompt == null,&#39;warning&#39;);
 
         prompt = nextPrompt;
         //返回可以取消prompt的函数
@@ -236,17 +230,17 @@
     const confirmTransitionTo = function(location,action,getUserConfirm,callback){
         if(prompt !== null){
             //如果prompt是函数类型，那就执行prompt获得要显示的提示信息。
-            const result = typeof prompt === &apos;function&apos;?prompt(location,action):prompt;
+            const result = typeof prompt === &#39;function&#39;?prompt(location,action):prompt;
 
             //如果提示信息是字符串类型（可以直接显示）
-            if(typeof result === &apos;string&apos;){
+            if(typeof result === &#39;string&#39;){
                 //判断有没有显示提示信息的函数
-                if(typeof getUserConfirmation === &apos;function&apos;){
+                if(typeof getUserConfirmation === &#39;function&#39;){
                     //在getUserConfirmation中会执行callback
                     getUserConfirmation(result,callback)
                 }else{
                     //如果传入了提示信息，但是没有显示提示信息的函数，则报错
-                    warning(false,&apos;warning&apos;);
+                    warning(false,&#39;warning&#39;);
                     //执行回调函数，一般回调函数的作用都是用来进行路由跳转的
                     callback(true);
                 }
@@ -293,7 +287,7 @@
         notifyListeners
     }
 }
-</code></pre><p>###handlePopState<br>看名字就可以猜到，这是popState事件的处理函数</p>
+</code></pre><h2 id="handlePopState"><a href="#handlePopState" class="headerlink" title="handlePopState"></a>handlePopState</h2><p>看名字就可以猜到，这是popState事件的处理函数</p>
 <pre><code>function handlePopState(event){
     //判断是否是无关的popState事件，按照isExtraneousPopstateEvent代码的意思
     //只有事件的state为undefined且不是ios上的chrome时才返回true。
@@ -302,7 +296,7 @@
     //开始处理popState事件,这里使用getDOMLocation生成了新的location对象
     handlePop(getDOMLocation(event.state))    
 }
-</code></pre><p>###handlePop<br>处理popState事件的主函数</p>
+</code></pre><h2 id="handlePop"><a href="#handlePop" class="headerlink" title="handlePop"></a>handlePop</h2><p>处理popState事件的主函数</p>
 <pre><code>function handlePop(location){
     //forceNextPop表示是否跳过block，直接执行监听函数
     if(forceNextPop){
@@ -311,7 +305,7 @@
         setState()；
     }else{
         //由于是处理的popState事件，所以action是POP
-        const action = &apos;POP&apos;;
+        const action = &#39;POP&#39;;
 
         transitionManager.confirmTransitionTo(location,
                                               action,
@@ -324,8 +318,7 @@
 
     }
 }
-</code></pre><p>###setState</p>
-<pre><code>const setState = function(nextState){
+</code></pre><h2 id="setState"><a href="#setState" class="headerlink" title="setState"></a>setState</h2><pre><code>const setState = function(nextState){
     //在路由发生跳转时，使用nextState更新history对象中的属性,主要是更新location和action属性
     //location是当前的path，action表示来到当前路径的动作是什么(POP,PUSH,REPLACE)        
     Object.assign(history, nextState);
@@ -334,8 +327,17 @@
     //依次执行每个监听函数，传入当前的location对象和action对象
     transitionManager.notifyListeners(history.location, history.action);
   };    
-</code></pre><p>###revertPop<br>    //fromLocation表示从哪来，toLocation表示要到哪里去<br>    //revertPop函数是当prompt返回false时执行的，也就是跳转失败<br>    //fromLocation是本来要跳转到的location，由于跳转失败所以需要再跳转回现在的location<br>    function revertPop(fromLocation){<br>        //只有当跳转成功时才会执行setState更新history中的location和action<br>        //所以现在history.location中仍然是跳转前的location<br>        const toLocation = history.location;<br>        //找到跳转前的location在数组中的位置<br>        let toIndex = allKeys.indexOf(toLocation.key);</p>
-<pre><code>    //判断两个location是否至少有一个存在且互不相等
+</code></pre><h2 id="revertPop"><a href="#revertPop" class="headerlink" title="revertPop"></a>revertPop</h2><pre><code>//fromLocation表示从哪来，toLocation表示要到哪里去
+//revertPop函数是当prompt返回false时执行的，也就是跳转失败
+//fromLocation是本来要跳转到的location，由于跳转失败所以需要再跳转回现在的location
+function revertPop(fromLocation){
+    //只有当跳转成功时才会执行setState更新history中的location和action
+    //所以现在history.location中仍然是跳转前的location
+    const toLocation = history.location;
+    //找到跳转前的location在数组中的位置
+    let toIndex = allKeys.indexOf(toLocation.key);
+
+    //判断两个location是否至少有一个存在且互不相等
     if (toIndex === -1) toIndex = 0;
     let fromIndex = allKeys.indexOf(fromLocation.key);
     if (fromIndex === -1) fromIndex = 0;
@@ -348,12 +350,12 @@
       go(delta);
     }
 };
-</code></pre><p>###go<br>go函数就是原生的history.go方法</p>
+</code></pre><h2 id="go"><a href="#go" class="headerlink" title="go"></a>go</h2><p>go函数就是原生的history.go方法</p>
 <pre><code>function go(delta){
     globalHistory.go(delta);
 }
 </code></pre><p>其余的还有goBack，goForward方法</p>
-<p>###checkDOMListeners</p>
+<p>##checkDOMListeners</p>
 <pre><code>//其中的handleHashChange函数，用于处理IE10和IE11在hash改变时，不能触发popstate事件的备选方案
 function checkDOMListeners(n){
     listenerCount += n;
@@ -375,7 +377,7 @@ function checkDOMListeners(n){
     }
 }
 </code></pre><p>checkDOMListeners函数要做的就是管理事件处理函数。通过传入的n来增减事件处理函数。</p>
-<p>###block<br>block函数主要用来给页面添加提示信息，添加了提示信息后的页面即相当于被‘block’了。</p>
+<h2 id="block"><a href="#block" class="headerlink" title="block"></a>block</h2><p>block函数主要用来给页面添加提示信息，添加了提示信息后的页面即相当于被‘block’了。</p>
 <pre><code>function block(prompt=false){
     //通过setPrompt添加提示信息
     const unblock = transitionManager.setPrompt(prompt);
@@ -400,8 +402,7 @@ function checkDOMListeners(n){
       };
 }
 </code></pre><p>可以看到block函数做了两个事情，添加提示信息，绑定事件处理程序。这两个事情是不相关的，setPrompt只是单纯的添加提示信息，checkDOMListeners只是为页面添加事件处理函数，只是在事件处理函数中如果发现页面添加了提示信息那么会根据提示信息的返回值确定是否要跳转，如果没有添加提示信息，那么就直接跳转。</p>
-<p>###listen</p>
-<pre><code>function listen(listener){
+<h2 id="listen"><a href="#listen" class="headerlink" title="listen"></a>listen</h2><pre><code>function listen(listener){
     //listener放入监听数组中，返回一个可以取消监听函数的回调
     const unlisten = transitionManager.appendListener(listener);
     //为当前页面添加事件处理函数
@@ -419,12 +420,6 @@ function checkDOMListeners(n){
   </div>
 </article>
 
-    <div class="blog-post-comments">
-        <div id="disqus_thread">
-            <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        </div>
-    </div>
-
 
 
     </div>
@@ -437,17 +432,13 @@ function checkDOMListeners(n){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </div>
 
     <div id="toc-footer" style="display: none">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#getDOMLocation"><span class="toc-number">1.</span> <span class="toc-text">getDOMLocation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#createLocation"><span class="toc-number">2.</span> <span class="toc-text">createLocation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#createTransitionManager"><span class="toc-number">3.</span> <span class="toc-text">createTransitionManager</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#handlePopState"><span class="toc-number">4.</span> <span class="toc-text">handlePopState</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#handlePop"><span class="toc-number">5.</span> <span class="toc-text">handlePop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setState"><span class="toc-number">6.</span> <span class="toc-text">setState</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#revertPop"><span class="toc-number">7.</span> <span class="toc-text">revertPop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go"><span class="toc-number">8.</span> <span class="toc-text">go</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#block"><span class="toc-number">9.</span> <span class="toc-text">block</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#listen"><span class="toc-number">10.</span> <span class="toc-text">listen</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -489,15 +480,12 @@ function checkDOMListeners(n){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </nav>
   </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
 </footer>
 
 </body>
@@ -523,18 +511,5 @@ function checkDOMListeners(n){
         ga('send', 'pageview');
     </script>
 
-
-    <!-- Disqus Comments -->
-    <script type="text/javascript">
-        var disqus_shortname = 'atelier-cave-dark';
-
-        (function(){
-            var dsq = document.createElement('script');
-            dsq.type = 'text/javascript';
-            dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        }());
-    </script>
 
 

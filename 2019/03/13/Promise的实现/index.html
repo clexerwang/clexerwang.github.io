@@ -6,18 +6,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="####Promise/A+规范http://www.ituring.com.cn/article/66566 #####规范总结：  1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当pr">
+    <meta name="description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结：1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。 2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rejec">
 <meta name="keywords" content="Promise">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Promise的实现">
 <meta property="og:url" content="http://yoursite.com/2019/03/13/Promise的实现/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="####Promise/A+规范http://www.ituring.com.cn/article/66566 #####规范总结：  1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当pr">
+<meta property="og:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结：1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。 2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rejec">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-13T08:41:51.865Z">
+<meta property="og:updated_time" content="2019-03-13T11:59:26.984Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Promise的实现">
-<meta name="twitter:description" content="####Promise/A+规范http://www.ituring.com.cn/article/66566 #####规范总结：  1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当pr">
+<meta name="twitter:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结：1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。 2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rejec">
     
     
         
@@ -57,11 +57,7 @@
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </span>
@@ -99,7 +95,7 @@
 
     </div>
     <div id="toc">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Promise-A-规范"><span class="toc-number">1.</span> <span class="toc-text">Promise/A+规范</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#规范总结："><span class="toc-number">1.1.</span> <span class="toc-text">规范总结：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Promise实现"><span class="toc-number">2.</span> <span class="toc-text">Promise实现</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -138,43 +134,23 @@
   
 
   <div class="content" itemprop="articleBody">
-    <p>####Promise/A+规范<br><a href="http://www.ituring.com.cn/article/66566" target="_blank" rel="noopener">http://www.ituring.com.cn/article/66566</a></p>
-<p>#####规范总结：</p>
-<pre>
-1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。
-
-2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rejected时会调用onRejected函数，且会传入promise的错误原因。
-注意：终值与错误原因都是不可变值，即前后需要满足‘===’；
-
-3、关于promise2 = promise1.then(onFulfilled, onRejected); 
-      promise3 = promise2.then(onFulfilled, onRejected);
-<pre>
-3-1、不管promise1执行了onFulfilled还是onRejected，promise2的状态都会是fulfilled，除非promise1报错则promise2状态会变为rejected并执行onRejected。
-
-3-2、不管在onFulfilled还是在onRejected中报错，都不会影响promise1的状态，只会影响promise2的状态；
-
-3-3、如果 onFulfilled 不是函数且 promise1 成功执行， promise2 状态为fulfilled并返回相同的值
-
-3-4、如果 onRejected 不是函数且 promise1 拒绝执行， promise2 状态为rejected并返回相同的据因
-
-对于返回值x：
-3-5、x是promise对象或者thenable对象：
-如果x的状态为pending，则promise2需要等x先执行，直到x的状态发生改变，
-如果x的状态为fulfilled，那么promise2的状态也为fulfilled，且将x的值传入promise2的onFulfilled函数作为参数。
-如果x的状态为rejected，那么promise2的状态也为rejected，且将错误信息传入promise2的onRejected函数作为参数。
-3-6、x是一个普通值，则以 x 为参数执行 promise2
-</pre>
-</pre>
-
-<p>####Promise实现</p>
-<pre><code>let nullFunc = function(){}
+    <h2 id="Promise-A-规范"><a href="#Promise-A-规范" class="headerlink" title="Promise/A+规范"></a>Promise/A+规范</h2><p><a href="http://www.ituring.com.cn/article/66566" target="_blank" rel="noopener">http://www.ituring.com.cn/article/66566</a></p>
+<h3 id="规范总结："><a href="#规范总结：" class="headerlink" title="规范总结："></a>规范总结：</h3><p>1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。</p>
+<p>2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rejected时会调用onRejected函数，且会传入promise的错误原因。<br>注意：终值与错误原因都是不可变值，即前后需要满足‘===’；</p>
+<p>3、关于promise2 = promise1.then(onFulfilled, onRejected);<br>      promise3 = promise2.then(onFulfilled, onRejected);</p>
+<p>3-1、不管promise1执行了onFulfilled还是onRejected，promise2的状态都会是fulfilled，除非promise1报错则promise2状态会变为rejected并执行onRejected。</p>
+<p>3-2、不管在onFulfilled还是在onRejected中报错，都不会影响promise1的状态，只会影响promise2的状态；</p>
+<p>3-3、如果 onFulfilled 不是函数且 promise1 成功执行， promise2 状态为fulfilled并返回相同的值</p>
+<p>3-4、如果 onRejected 不是函数且 promise1 拒绝执行， promise2 状态为rejected并返回相同的据因</p>
+<p>对于返回值x：<br>3-5、x是promise对象或者thenable对象：<br>如果x的状态为pending，则promise2需要等x先执行，直到x的状态发生改变，<br>如果x的状态为fulfilled，那么promise2的状态也为fulfilled，且将x的值传入promise2的onFulfilled函数作为参数。<br>如果x的状态为rejected，那么promise2的状态也为rejected，且将错误信息传入promise2的onRejected函数作为参数。<br>3-6、x是一个普通值，则以 x 为参数执行 promise2</p>
+<h2 id="Promise实现"><a href="#Promise实现" class="headerlink" title="Promise实现"></a>Promise实现</h2><pre><code>let nullFunc = function(){}
 
 //Promise的构造函数
 function Promise(executer){
   //首先判断executer是否为函数
-  if(!executer instanceof function) throw new TypeError(&apos;TypeError&apos;);
+  if(!executer instanceof function) throw new TypeError(&#39;TypeError&#39;);
 
- this.state = &apos;pending&apos;;
+ this.state = &#39;pending&#39;;
  this.value = null;
  this.queue = []; //用来保存绑定的子promise
 
@@ -221,7 +197,7 @@ function doResolve(promise,value){
       safelyResolveThen(promise,then);
     }else{
       //如果value不是thenable对象，那么直接确定promise的状态
-      promise.state = &apos;fulfilled&apos;;
+      promise.state = &#39;fulfilled&#39;;
       promise.value = value;
       //开始遍历通知绑定在该promise上的子promise，给子promise传value，让子promise改变状态
       promise.queue.forEach((e)=&gt;{e.callFulfilled(value)});
@@ -234,7 +210,7 @@ function doResolve(promise,value){
 
 
 function doReject(promise,error){
-  promise.state = &apos;rejected&apos;;
+  promise.state = &#39;rejected&#39;;
   promise.value = error;
   promise.forEach((e)=&gt;{e.callRejected(error)});//道理同doResolve
 }
@@ -242,15 +218,15 @@ function doReject(promise,error){
 //然后是then函数
 Promise.prototype.then = function(onFulfilled,onRejected){
   //这里是值穿透，如果当前promise以确定状态，但是为传入相应的执行函数，则直接把当前的promise作为then函数的返回值。
-  if(this.state === &apos;fulfilled&apos;&amp;&amp;!onFulfilled instanceof function || this.state === &apos;rejected&apos;&amp;&amp; !onRejected instanceof function) 
+  if(this.state === &#39;fulfilled&#39;&amp;&amp;!onFulfilled instanceof function || this.state === &#39;rejected&#39;&amp;&amp; !onRejected instanceof function) 
 return this;
 
   //根据promise/A+规定，每个then都要返回新的promise
   let newPromise = new Promise(nullFunc);
 
   //根据promise的状态来执行对应的函数
-  if(this.state !== &apos;pending&apos;){
-    let resolver = this.state===&apos;fulfilled&apos;?onFulfilled:onRejected;
+  if(this.state !== &#39;pending&#39;){
+    let resolver = this.state===&#39;fulfilled&#39;?onFulfilled:onRejected;
     //异步执行对应的函数,这里需要传入value，因为resolver执行时会自动传入父级promise的值
     unwrap(newPromise,resolver,this.value);
   }else{
@@ -272,7 +248,7 @@ function unwrap(promise,exectuer,value){
       doReject(promise,error)
     }
     //如果返回的是同一个promise，会引起循环引用，报错
-    if(returnValue === promise) throw new TypeError(&apos;TypeError&apos;);
+    if(returnValue === promise) throw new TypeError(&#39;TypeError&#39;);
     else{
       doResolve(promise,returnValue);
     }
@@ -316,7 +292,7 @@ Promise.reject = function(value){
 
 Promise.all = function(arrays){
   //如果arrays不是可迭代对象，直接报错
-  if(!arrays[Symbol.iterator]) throw new TypeError(&apos;TypeError&apos;);
+  if(!arrays[Symbol.iterator]) throw new TypeError(&#39;TypeError&#39;);
 
   let called = false;
   let resolved = 0;
@@ -342,7 +318,7 @@ Promise.all = function(arrays){
 }
 
 Promise.race = function(arrays){
-  if(!arrays[Symbol.iterator]) throw new TypeError(&apos;TypeError&apos;);
+  if(!arrays[Symbol.iterator]) throw new TypeError(&#39;TypeError&#39;);
 
   let len = arrays.length;
   if(!len) return this.resolve([]);
@@ -369,12 +345,6 @@ Promise.race = function(arrays){
   </div>
 </article>
 
-    <div class="blog-post-comments">
-        <div id="disqus_thread">
-            <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        </div>
-    </div>
-
 
 
     </div>
@@ -387,17 +357,13 @@ Promise.race = function(arrays){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </div>
 
     <div id="toc-footer" style="display: none">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Promise-A-规范"><span class="toc-number">1.</span> <span class="toc-text">Promise/A+规范</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#规范总结："><span class="toc-number">1.1.</span> <span class="toc-text">规范总结：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Promise实现"><span class="toc-number">2.</span> <span class="toc-text">Promise实现</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -439,15 +405,12 @@ Promise.race = function(arrays){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </nav>
   </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
 </footer>
 
 </body>
@@ -473,18 +436,5 @@ Promise.race = function(arrays){
         ga('send', 'pageview');
     </script>
 
-
-    <!-- Disqus Comments -->
-    <script type="text/javascript">
-        var disqus_shortname = 'atelier-cave-dark';
-
-        (function(){
-            var dsq = document.createElement('script');
-            dsq.type = 'text/javascript';
-            dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        }());
-    </script>
 
 

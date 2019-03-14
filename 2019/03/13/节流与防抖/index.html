@@ -6,17 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="节流与防抖对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。 函数防抖：对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。eg:     window.onscroll = setDebouncing();//返回一个事件处理函数 functio">
+    <meta name="description" content="对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。 函数防抖：对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。eg: window.onscroll = setDebouncing();//返回一个事件处理函数      function se">
 <meta property="og:type" content="article">
 <meta property="og:title" content="节流与防抖">
 <meta property="og:url" content="http://yoursite.com/2019/03/13/节流与防抖/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="节流与防抖对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。 函数防抖：对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。eg:     window.onscroll = setDebouncing();//返回一个事件处理函数 functio">
+<meta property="og:description" content="对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。 函数防抖：对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。eg: window.onscroll = setDebouncing();//返回一个事件处理函数      function se">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-13T11:00:56.705Z">
+<meta property="og:updated_time" content="2019-03-13T11:51:54.874Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="节流与防抖">
-<meta name="twitter:description" content="节流与防抖对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。 函数防抖：对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。eg:     window.onscroll = setDebouncing();//返回一个事件处理函数 functio">
+<meta name="twitter:description" content="对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。 函数防抖：对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。eg: window.onscroll = setDebouncing();//返回一个事件处理函数      function se">
     
     
         
@@ -56,11 +56,7 @@
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </span>
@@ -98,7 +94,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#节流与防抖"><span class="toc-number">1.</span> <span class="toc-text">节流与防抖</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#函数防抖："><span class="toc-number">1.0.0.1.</span> <span class="toc-text">函数防抖：</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#函数防抖："><span class="toc-number">1.</span> <span class="toc-text">函数防抖：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数节流："><span class="toc-number">2.</span> <span class="toc-text">函数节流：</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -132,94 +128,89 @@
   
 
   <div class="content" itemprop="articleBody">
-    <h1 id="节流与防抖"><a href="#节流与防抖" class="headerlink" title="节流与防抖"></a>节流与防抖</h1><p>对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。</p>
-<h4 id="函数防抖："><a href="#函数防抖：" class="headerlink" title="函数防抖："></a>函数防抖：</h4><p>对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。<br>eg:</p>
-<p><pre><code><br>    window.onscroll = setDebouncing();//返回一个事件处理函数</code></pre></p>
-<pre><code>function setDebouncing(){
-    var timer = null;       //首次执行，设置句柄。
-    return function(){      //事件处理程序
-        clearTimeout(timer); //每次执行都会清除上次设置的定时器，防止频繁执行。
-        timer = setTimeout(function(){
-                        console.log(&apos;this is debouncing&apos;);
-                        },1000)
-            }            
-    }
-</code></pre><p><br>上面的函数可以保证最终一定会执行至少一次事件处理程序。</p>
-<p>更进一步：可以更改为事件第一次触发时立即执行事件处理程序，之后不可以触发。。<br>eg：</p>
-<pre><code>window.onscroll = setDebouncing(deal,immediate);//传入事件处理程序
+    <p>对于那些被频繁触发的事件，由于他们可能会进行DOM操作，从而占据大量的资源，因而需要对频繁出发的事件做出优化，优化有两种方法：函数节流和函数防抖。</p>
+<h2 id="函数防抖："><a href="#函数防抖：" class="headerlink" title="函数防抖："></a>函数防抖：</h2><p>对于短时间内被频繁触发的事件，如果在指定的时间间隔内事件被再次触发，这时就会清除上次设置的定时器，重新计时。<br>eg:</p>
+<pre><code>window.onscroll = setDebouncing();//返回一个事件处理函数
 
-function setDebouncing(func){
-        var timer = null;
-        var doNow;
-        return function(){
-            clearTimeout(timer); //先清除上次的定时器
-            //如果要先立即执行
-            if(immediate){
-                doNow = !timer; //如果之前还没有设置定时器，即第一次触发事件处理程序，这时timer为null，doNow为true。
-                timer = setTimeout(function(){
-                    timer = null;
-                },1000);
-                if(doNow)
-                func();
-            }else{
-                timer = setTimeout(func,1000);
-            }                
-        }
-    }
-</code></pre><p>####函数节流：<br>是指每隔一段时间执行一次函数，比如页面一直在触发scroll事件，函数节流用来规定每隔固定时间执行一次事件处理程序。<br>它有两种实现方式：时间戳，定时器。<br><b>时间戳：</b><br>eg：</p>
-<pre><code>window.onscroll = setThrottle(func,interval);//传入事件处理程序和时间间隔
-
-function setThrottle(func,interval){
-    var nowTime = Date.now();//获得当前时间
-    return function(){
-        if(Date.now() - nowTime &gt;= interval){
-            func();
-            nowTime = Date.now();
-        }
-    }
-}
-</code></pre><p><b>定时器：</b><br>eg：</p>
-<pre><code>window.onscroll = setThrottle(func,interval);
-
-function setThrottle(func,interval){
-    var timer;
-    return function(){
-        if(!timer){   //判断当前是否已经设置了定时器，如果设置了定时器则忽略之后的定时器，直到设置的定时器执行之后，再将句柄设置为null。
+    function setDebouncing(){
+        var timer = null;       //首次执行，设置句柄。
+        return function(){      //事件处理程序
+            clearTimeout(timer); //每次执行都会清除上次设置的定时器，防止频繁执行。
             timer = setTimeout(function(){
-                                func();
-                                timer = null;
-                                  },interval);
-                }
-           }
-} 
-</code></pre><p><b>综合使用时间戳和定时器：</b><br>可以在第一次触发时立即执行一次函数，并在最后再执行一次函数的函数节流。<br>eg：</p>
-<pre><code>window.onscroll = setThrottle(func,interval);
+                            console.log(&#39;this is debouncing&#39;);
+                            },1000)
+                }            
+        }
+</code></pre><p>上面的函数可以保证最终一定会执行至少一次事件处理程序。</p>
+<p>更进一步：可以更改为事件第一次触发时立即执行事件处理程序，之后不可以触发。。<br>eg：</p>
+<pre><code>    window.onscroll = setDebouncing(deal,immediate);//传入事件处理程序
 
-function setThrottle(func,interval){
-   var startDate = Date.now(); //绑定事件的时候
-   var timer = null;
-   return function(){
-            clearTimeout(timer);
-            var nowDate = Date.now(); //事件触发的时间
-            //如果事件触发时已经超过了预期的时间间隔，则可以立即执行函数
-            if(interval - (nowDate - startDate)&lt;= 0){
+    function setDebouncing(func){
+            var timer = null;
+            var doNow;
+            return function(){
+                clearTimeout(timer); //先清除上次的定时器
+                //如果要先立即执行
+                if(immediate){
+                    doNow = !timer; //如果之前还没有设置定时器，即第一次触发事件处理程序，这时timer为null，doNow为true。
+                    timer = setTimeout(function(){
+                        timer = null;
+                    },1000);
+                    if(doNow)
                     func();
-                    startDate = Date.now();//更新时间
-            }else{
-                //如果小于预期的时间间隔，则设置定时器
-                timer = setTimeout(func,interval - (nowDate - startDate))
+                }else{
+                    timer = setTimeout(func,1000);
+                }                
             }
         }
-}
+</code></pre><h2 id="函数节流："><a href="#函数节流：" class="headerlink" title="函数节流："></a>函数节流：</h2><p>是指每隔一段时间执行一次函数，比如页面一直在触发scroll事件，函数节流用来规定每隔固定时间执行一次事件处理程序。<br>它有两种实现方式：时间戳，定时器。<br><b>时间戳：</b><br>eg：</p>
+<pre><code>    window.onscroll = setThrottle(func,interval);//传入事件处理程序和时间间隔
+
+    function setThrottle(func,interval){
+        var nowTime = Date.now();//获得当前时间
+        return function(){
+            if(Date.now() - nowTime &gt;= interval){
+                func();
+                nowTime = Date.now();
+            }
+        }
+    }
+</code></pre><p><b>定时器：</b><br>eg：</p>
+<pre><code>    window.onscroll = setThrottle(func,interval);
+
+    function setThrottle(func,interval){
+        var timer;
+        return function(){
+            if(!timer){   //判断当前是否已经设置了定时器，如果设置了定时器则忽略之后的定时器，直到设置的定时器执行之后，再将句柄设置为null。
+                timer = setTimeout(function(){
+                                    func();
+                                    timer = null;
+                                      },interval);
+                    }
+               }
+    } 
+</code></pre><p><b>综合使用时间戳和定时器：</b><br>可以在第一次触发时立即执行一次函数，并在最后再执行一次函数的函数节流。<br>eg：</p>
+<pre><code>    window.onscroll = setThrottle(func,interval);
+
+    function setThrottle(func,interval){
+       var startDate = Date.now(); //绑定事件的时候
+       var timer = null;
+       return function(){
+                clearTimeout(timer);
+                var nowDate = Date.now(); //事件触发的时间
+                //如果事件触发时已经超过了预期的时间间隔，则可以立即执行函数
+                if(interval - (nowDate - startDate)&lt;= 0){
+                        func();
+                        startDate = Date.now();//更新时间
+                }else{
+                    //如果小于预期的时间间隔，则设置定时器
+                    timer = setTimeout(func,interval - (nowDate - startDate))
+                }
+            }
+    }
 </code></pre>
   </div>
 </article>
-
-    <div class="blog-post-comments">
-        <div id="disqus_thread">
-            <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        </div>
-    </div>
 
 
 
@@ -233,17 +224,13 @@ function setThrottle(func,interval){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#节流与防抖"><span class="toc-number">1.</span> <span class="toc-text">节流与防抖</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#函数防抖："><span class="toc-number">1.0.0.1.</span> <span class="toc-text">函数防抖：</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#函数防抖："><span class="toc-number">1.</span> <span class="toc-text">函数防抖：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数节流："><span class="toc-number">2.</span> <span class="toc-text">函数节流：</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -285,15 +272,12 @@ function setThrottle(func,interval){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </nav>
   </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
 </footer>
 
 </body>
@@ -319,18 +303,5 @@ function setThrottle(func,interval){
         ga('send', 'pageview');
     </script>
 
-
-    <!-- Disqus Comments -->
-    <script type="text/javascript">
-        var disqus_shortname = 'atelier-cave-dark';
-
-        (function(){
-            var dsq = document.createElement('script');
-            dsq.type = 'text/javascript';
-            dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        }());
-    </script>
 
 

@@ -6,17 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="####运算符+号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。eg：     var str = +[]; console.log(str);    //0  var str = !+[]+[]+![]; //!+[]先进行转换，变为!0 //![]转换为0 //则 console.log(str);    //truefalse 参考文章：http://justjavac.com/">
+    <meta name="description" content="运算符+号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。eg：     var str = +[]; console.log(str);    //0  var str = !+[]+[]+![]; //!+[]先进行转换，变为!0 //![]转换为0 //则 console.log(str);    //truefalse 参考文章：http://justjavac.com/java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JS杂录">
 <meta property="og:url" content="http://yoursite.com/2019/03/13/JS杂录/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="####运算符+号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。eg：     var str = +[]; console.log(str);    //0  var str = !+[]+[]+![]; //!+[]先进行转换，变为!0 //![]转换为0 //则 console.log(str);    //truefalse 参考文章：http://justjavac.com/">
+<meta property="og:description" content="运算符+号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。eg：     var str = +[]; console.log(str);    //0  var str = !+[]+[]+![]; //!+[]先进行转换，变为!0 //![]转换为0 //则 console.log(str);    //truefalse 参考文章：http://justjavac.com/java">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-13T09:04:14.937Z">
+<meta property="og:updated_time" content="2019-03-13T11:58:23.488Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JS杂录">
-<meta name="twitter:description" content="####运算符+号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。eg：     var str = +[]; console.log(str);    //0  var str = !+[]+[]+![]; //!+[]先进行转换，变为!0 //![]转换为0 //则 console.log(str);    //truefalse 参考文章：http://justjavac.com/">
+<meta name="twitter:description" content="运算符+号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。eg：     var str = +[]; console.log(str);    //0  var str = !+[]+[]+![]; //!+[]先进行转换，变为!0 //![]转换为0 //则 console.log(str);    //truefalse 参考文章：http://justjavac.com/java">
     
     
         
@@ -56,11 +56,7 @@
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </span>
@@ -98,7 +94,7 @@
 
     </div>
     <div id="toc">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#运算符"><span class="toc-number">1.</span> <span class="toc-text">运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#连等赋值问题"><span class="toc-number">2.</span> <span class="toc-text">连等赋值问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JS中精度丢失的问题"><span class="toc-number">3.</span> <span class="toc-text">JS中精度丢失的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一道综合性的面试题"><span class="toc-number">4.</span> <span class="toc-text">一道综合性的面试题</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -132,7 +128,7 @@
   
 
   <div class="content" itemprop="articleBody">
-    <p>####运算符<br><code>+</code>号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。<br>eg：    </p>
+    <h2 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h2><p><code>+</code>号运算符：作为一元运算符时，它将后面的操作数转换成数字类型。<br>eg：    </p>
 <pre><code>var str = +[];
 console.log(str);    //0
 
@@ -142,7 +138,7 @@ var str = !+[]+[]+![];
 //则
 console.log(str);    //truefalse
 </code></pre><p>参考文章：<a href="http://justjavac.com/javascript/2012/12/20/object-plus-object.html" target="_blank" rel="noopener">http://justjavac.com/javascript/2012/12/20/object-plus-object.html</a></p>
-<p>####连等赋值问题<br>问题：</p>
+<h2 id="连等赋值问题"><a href="#连等赋值问题" class="headerlink" title="连等赋值问题"></a>连等赋值问题</h2><p>问题：</p>
 <pre><code>var a ={n:1};
 var b = a;
 a.x = a = {n:2};
@@ -158,15 +154,14 @@ a.x = a = {n:2};
 //全部过程为
 a = {n:2};
 {n:1}.x = {n:2};
-</code></pre><p>####JS中精度丢失的问题<br>JS使用IEEE 754 双精度 64 位浮点数来存储数值，其格式为：1位符号位，11位指数位，52位尾数位。因而对于小数和大整数就存在精度丢失的问题。<br>eg：</p>
+</code></pre><h2 id="JS中精度丢失的问题"><a href="#JS中精度丢失的问题" class="headerlink" title="JS中精度丢失的问题"></a>JS中精度丢失的问题</h2><p>JS使用IEEE 754 双精度 64 位浮点数来存储数值，其格式为：1位符号位，11位指数位，52位尾数位。因而对于小数和大整数就存在精度丢失的问题。<br>eg：</p>
 <pre><code>0.1+0.2 == 0.3; //false
 9999999999999999 == 10000000000000000; //true
 </code></pre><p><b>小数精度丢失</b>:<br>首先要知道0.1和0.2是怎么以64位二进制来表示的：<br>    0.0001 1001 1001 1001 1001(1001)······<br>    0.0011 0011 0011 0011 0011(0011)······<br>采用科学记数法表示后为：<br>    1.1001 1001 1001 1001 1001····(小数后一共52位) <em>2^-4<br>    1.1001 1001 1001 1001 1001····(小数后一共52位) </em>2^-3</p>
 <p>之后进行加法运算：<br>需要把较小的数的指数位变成与加大的数相同<br>即把0.1变成：<br>    0.1100 1100 1100 1100 1100 ····(小数后一共52位) <em>2^-3<br>然后进行与0.2进行加法运算，得到：<br>    10.0110 0110 0110…001 </em> 2^-3<br>    等价于：<br>    0.0100 1100 1100 11…001<br>    转换为十进制为：<br>    0.30000000000000004</p>
 <p>得出一个结论：<b>当十进制小数的二进制表示的有限数字不超过 52 位时，在 JavaScript 里是可以精确存储的。</b></p>
 <p><b>大整数的精度丢失</b><br>我们知道JS中最大值为：符号位取1，52 位尾数位全填充 1, 11位指数位全为1。<br>这个问题与 MAX_VALUE 没什么关系，还得归属到尾数只有 52 位上来。<br>当值小于等于 2^53 时，可以确保精度不会丢失。当值大于 2^53 时，精度就有可能会丢失。</p>
-<p>####一道综合性的面试题</p>
-<pre><code>function Foo() { 
+<h2 id="一道综合性的面试题"><a href="#一道综合性的面试题" class="headerlink" title="一道综合性的面试题"></a>一道综合性的面试题</h2><pre><code>function Foo() { 
     getName = function () { 
         alert (1); 
         }; 
@@ -213,12 +208,6 @@ new new Foo().getName();//3
   </div>
 </article>
 
-    <div class="blog-post-comments">
-        <div id="disqus_thread">
-            <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        </div>
-    </div>
-
 
 
     </div>
@@ -231,17 +220,13 @@ new new Foo().getName();//3
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </div>
 
     <div id="toc-footer" style="display: none">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#运算符"><span class="toc-number">1.</span> <span class="toc-text">运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#连等赋值问题"><span class="toc-number">2.</span> <span class="toc-text">连等赋值问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JS中精度丢失的问题"><span class="toc-number">3.</span> <span class="toc-text">JS中精度丢失的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一道综合性的面试题"><span class="toc-number">4.</span> <span class="toc-text">一道综合性的面试题</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -283,15 +268,12 @@ new new Foo().getName();//3
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </nav>
   </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
 </footer>
 
 </body>
@@ -317,18 +299,5 @@ new new Foo().getName();//3
         ga('send', 'pageview');
     </script>
 
-
-    <!-- Disqus Comments -->
-    <script type="text/javascript">
-        var disqus_shortname = 'atelier-cave-dark';
-
-        (function(){
-            var dsq = document.createElement('script');
-            dsq.type = 'text/javascript';
-            dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        }());
-    </script>
 
 

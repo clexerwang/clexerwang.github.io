@@ -6,17 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="React-Router链接：https://blog.csdn.net/sinat_17775997/article/details/69218382React-Router 在v4版本分成了如下几个包：        react-router          React Router 核心    react-router-dom      用于 DOM 绑定的 React Router">
+    <meta name="description" content="链接：https://blog.csdn.net/sinat_17775997/article/details/69218382React-Router 在v4版本分成了如下几个包：        react-router          React Router 核心    react-router-dom      用于 DOM 绑定的 React Router    react-route">
 <meta property="og:type" content="article">
 <meta property="og:title" content="React-Router源码探析">
 <meta property="og:url" content="http://yoursite.com/2019/03/13/React-Router源码探析/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="React-Router链接：https://blog.csdn.net/sinat_17775997/article/details/69218382React-Router 在v4版本分成了如下几个包：        react-router          React Router 核心    react-router-dom      用于 DOM 绑定的 React Router">
+<meta property="og:description" content="链接：https://blog.csdn.net/sinat_17775997/article/details/69218382React-Router 在v4版本分成了如下几个包：        react-router          React Router 核心    react-router-dom      用于 DOM 绑定的 React Router    react-route">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-13T11:13:21.526Z">
+<meta property="og:updated_time" content="2019-03-13T12:04:08.925Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React-Router源码探析">
-<meta name="twitter:description" content="React-Router链接：https://blog.csdn.net/sinat_17775997/article/details/69218382React-Router 在v4版本分成了如下几个包：        react-router          React Router 核心    react-router-dom      用于 DOM 绑定的 React Router">
+<meta name="twitter:description" content="链接：https://blog.csdn.net/sinat_17775997/article/details/69218382React-Router 在v4版本分成了如下几个包：        react-router          React Router 核心    react-router-dom      用于 DOM 绑定的 React Router    react-route">
     
     
         
@@ -56,11 +56,7 @@
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </span>
@@ -71,7 +67,7 @@
         <li><a class="icon" href="/2019/03/13/History库源码学习/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
-        <li><a class="icon" href="/2019/03/13/React-setState的异步与同步/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        <li><a class="icon" href="/2019/03/13/async-await/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
         
         <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
         <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
@@ -98,7 +94,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#React-Router"><span class="toc-number">1.</span> <span class="toc-text">React-Router</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#路由实现"><span class="toc-number">1.</span> <span class="toc-text">路由实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HashRouter"><span class="toc-number">2.</span> <span class="toc-text">HashRouter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BrowserRouter"><span class="toc-number">3.</span> <span class="toc-text">BrowserRouter</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#上面说完了实现的基本原理后，现在了解一下React-Router的具体用法："><span class="toc-number">3.1.</span> <span class="toc-text">上面说完了实现的基本原理后，现在了解一下React-Router的具体用法：</span></a></li></ol></li></ol>
     </div>
   </span>
 </div>
@@ -132,9 +128,54 @@
   
 
   <div class="content" itemprop="articleBody">
-    <h1 id="React-Router"><a href="#React-Router" class="headerlink" title="React-Router"></a>React-Router</h1><p>链接：<a href="https://blog.csdn.net/sinat_17775997/article/details/69218382" target="_blank" rel="noopener">https://blog.csdn.net/sinat_17775997/article/details/69218382</a><br>React-Router 在v4版本分成了如下几个包：<br>    <pre><br>    <strong>react-router</strong>          React Router 核心<br>    <strong>react-router-dom</strong>      用于 DOM 绑定的 React Router<br>    <strong>react-router-native</strong>   用于 React Native 的 React Router<br>    <strong>react-router-redux</strong>    React Router 和 Redux 的集成<br>    <strong>react-router-config</strong>    静态路由配置的小助手<br>   </pre><br>那么在浏览器中使用React-Router时只需要导入 <strong>react-router-dom</strong>这个包就可以了，它和<strong>react-router</strong>相比，基本相同，唯一的差异就是<strong>react-router</strong>少了<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#### 路由实现</span><br><span class="line"></span><br><span class="line">在React-Router中路由的实现有三种方式：```HashRouter、BrowserRouter、MemeryRouter```。</span><br><span class="line"></span><br><span class="line">任何改变页面URL的操作都会产生新的历史记录(除了```history.replaceState()，location.replace()```,他俩是用来替换历史记录的。此外在历史记录中前进，后退，刷新也不会产生新的历史记录)</span><br><span class="line"></span><br><span class="line">#### HashRouter</span><br><span class="line"></span><br><span class="line">HashRouter是通过改变页面URI中的hash部分来实现路由功能的。</span><br><span class="line">首先，先说一下```location```对象，它保存了当前页面的信息，```window.location ==== document.location ==== location```，即他们都是同一个对象。</span><br><span class="line"></span><br><span class="line">location对象拥有若干个属性，分别表示当前页面URL的不同信息：</span><br><span class="line"></span><br><span class="line">例如：  http://www.baidu.com:80/home/page_one/title?name=js#partone 中</span><br><span class="line"></span><br><span class="line">	hash        //当前URL中的hash信息，以&apos;#&apos;号开头：#partone</span><br><span class="line">	host        //当前URL中的服务器名和端口号：www.baidu.com:80</span><br><span class="line">	hostname    //当前URL中的服务器名：www.baidu.com</span><br><span class="line">	href        //当前的完整URL,在设置href的值时，区分绝对路径和相对路径，</span><br><span class="line">	例如 http://www.baidu.com/a/b/c</span><br><span class="line">	如果为 location.href = &apos;a&apos;,这个是相对路径，他只会改变当前路径的最后一位，变为：http://www.baidu.com/a/b/a</span><br><span class="line">	如果为 location.href = &apos;/z&apos;，这个是绝对路径，它会改变当前URL的整个路径，变为：http://www.baidu.com/z</span><br><span class="line"></span><br><span class="line">	pathname    //当前URL中的路径：/home/page_one/title</span><br><span class="line">	port        //当前URL中的端口号：80</span><br><span class="line">	protocol    //当前URL中的协议：http</span><br><span class="line">	search      //当前URL中的查询字符串：?name=js</span><br><span class="line"></span><br><span class="line">可以看到```location```对象的各个属性对应了URL的不同部分，当改变了除```hash```以外的任意属性时，页面都会以新的URL重新加载。同时当改变了任意属性时，都会产生一个新的历史记录，保存在```history```对象中。</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	location.replace(&apos;  &apos;):访问新的URL，并在历史记录中用新的URL替换掉当前的URL</span><br><span class="line">	location.reload():重新加载当前页面</span><br><span class="line">	location.reload(true):强制从服务器重新加载当前页面</span><br><span class="line">通过hashchange事件来监听hash值的变化。</span><br><span class="line"></span><br><span class="line">说完了location对象后就可以明白，HashRouter的实现原理就是：由于hash的变化不会导致页面重新加载，所以可以一边通过操作改变页面的hash值，一边通过监听页面hash值的变化来执行相应的操作。</span><br><span class="line"></span><br><span class="line">a标签也可以改变页面的hash值：</span><br><span class="line">	</span><br><span class="line">	&lt;a href=&apos;#hash&apos;&gt;click&lt;/a&gt;</span><br><span class="line"></span><br><span class="line">####BrowserRouter</span><br><span class="line">BrowserRouter是通过```history```对象实现的。</span><br><span class="line">```history```对象保存了当前页面的所有历史记录。</span><br><span class="line">	</span><br><span class="line">	history.length    //历史记录的数量</span><br><span class="line">	history.go()      //可以在历史记录中前后跳转</span><br><span class="line">	history.back()    //向后跳转一个记录</span><br><span class="line">	history.forward() //向前跳转一个记录</span><br><span class="line">在HTML5中又为history对象增添了新的方法和属性：</span><br><span class="line"></span><br><span class="line">	history.pushState()      //插入新的历史记录  </span><br><span class="line">	history.replaceState()   //替换历史记录</span><br><span class="line">	history.state            //当前历史记录的state对象</span><br><span class="line"></span><br><span class="line">```history.pushState(state,label,path)```：向history中放入新的历史记录，可以看到该方法有三个参数:</span><br><span class="line"></span><br><span class="line">&lt;b&gt;```state```参数&lt;/b&gt;：负责给当前历史记录的state属性传值(在上面可以看到history对象有一个state属性)，同时当触发popstate事件时，该事件对象的state属性就是上面的参数的副本。</span><br><span class="line">	</span><br><span class="line">	history.pushState(&#123;name:1&#125;,&apos;&apos;,&apos;/a&apos;);</span><br><span class="line">	history.state;     //&#123;name:1&#125;</span><br><span class="line">	window.onpopstate = function(event)&#123;</span><br><span class="line">		event.state;   //&#123;name:1&#125;</span><br><span class="line">	&#125; </span><br><span class="line">&lt;b&gt;```label```参数&lt;b&gt;：目前浏览器都忽略了这个参数。</span><br><span class="line"></span><br><span class="line">&lt;b&gt;```path```参数&lt;b&gt;：要存入的新的历史记录，可以是一整个URL，也可以是相对路径或绝对路径(模式与location.href属性相同),新旧历史记录必须```同源```，否则会报错。</span><br><span class="line"></span><br><span class="line">```pushState不会触发hashChange事件,同时执行pushState会直接删除之后的所有历史记录</span><br></pre></td></tr></table></figure></p>
-<p><b><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">```popState事件```：当在历史记录中前进，后退，使用location.hash改变URL时都会触发该事件，但只有当所处的历史记录是由```pushState```放入或```replaceState```替换的时候，事件对象的state属性才是当前历史记录的state属性的副本。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">所以```history.pushState```和```history.replacestate```都可以在不刷新页面的情况下更改当前页面的URL。</span><br><span class="line">但是这也会产生一定的问题：在改变了页面的URL后，如果刷新了页面，浏览器就会按照当前的URL向服务器发送请求，服务器中肯定没有对应的资源，就会导致刷新后显示404的情况，这就需要服务器做出一定的设置。</span><br><span class="line"></span><br><span class="line">#####上面说完了实现的基本原理后，现在了解一下React-Router的具体用法：</span><br><span class="line"></span><br><span class="line">1、 ```&lt;BrowserRouter&gt;</span><br></pre></td></tr></table></figure></b></p>
-<p>它就是通过history对象来实现路由的，下面列出了它的几个属性：</p>
+    <p>链接：<a href="https://blog.csdn.net/sinat_17775997/article/details/69218382" target="_blank" rel="noopener">https://blog.csdn.net/sinat_17775997/article/details/69218382</a><br>React-Router 在v4版本分成了如下几个包：<br>    <pre><br>    <strong>react-router</strong>          React Router 核心<br>    <strong>react-router-dom</strong>      用于 DOM 绑定的 React Router<br>    <strong>react-router-native</strong>   用于 React Native 的 React Router<br>    <strong>react-router-redux</strong>    React Router 和 Redux 的集成<br>    <strong>react-router-config</strong>    静态路由配置的小助手<br>   </pre><br>那么在浏览器中使用React-Router时只需要导入 <strong>react-router-dom</strong>这个包就可以了，它和<strong>react-router</strong>相比，基本相同，唯一的差异就是<strong>react-router</strong>少了<code>&lt;BrowserRouter&gt;</code>和<code>&lt;Link&gt;</code>这两个组件。</p>
+<h2 id="路由实现"><a href="#路由实现" class="headerlink" title="路由实现"></a>路由实现</h2><p>在React-Router中路由的实现有三种方式：<code>HashRouter、BrowserRouter、MemeryRouter</code>。<br>任何改变页面URL的操作都会产生新的历史记录(除了<code>history.replaceState()，location.replace()</code>,他俩是用来替换历史记录的。此外在历史记录中前进，后退，刷新也不会产生新的历史记录)</p>
+<h2 id="HashRouter"><a href="#HashRouter" class="headerlink" title="HashRouter"></a>HashRouter</h2><p>HashRouter是通过改变页面URI中的hash部分来实现路由功能的。<br>首先，先说一下<code>location</code>对象，它保存了当前页面的信息，<code>window.location ==== document.location ==== location</code>，即他们都是同一个对象。</p>
+<p>location对象拥有若干个属性，分别表示当前页面URL的不同信息：</p>
+<p>例如：  <a href="http://www.baidu.com:80/home/page_one/title?name=js#partone" target="_blank" rel="noopener">http://www.baidu.com:80/home/page_one/title?name=js#partone</a> 中</p>
+<pre><code>hash        //当前URL中的hash信息，以&#39;#&#39;号开头：#partone
+host        //当前URL中的服务器名和端口号：www.baidu.com:80
+hostname    //当前URL中的服务器名：www.baidu.com
+href        //当前的完整URL,在设置href的值时，区分绝对路径和相对路径，
+例如 http://www.baidu.com/a/b/c
+如果为 location.href = &#39;a&#39;,这个是相对路径，他只会改变当前路径的最后一位，变为：http://www.baidu.com/a/b/a
+如果为 location.href = &#39;/z&#39;，这个是绝对路径，它会改变当前URL的整个路径，变为：http://www.baidu.com/z
+
+pathname    //当前URL中的路径：/home/page_one/title
+port        //当前URL中的端口号：80
+protocol    //当前URL中的协议：http
+search      //当前URL中的查询字符串：?name=js
+</code></pre><p>可以看到<code>location</code>对象的各个属性对应了URL的不同部分，当改变了除<code>hash</code>以外的任意属性时，页面都会以新的URL重新加载。同时当改变了任意属性时，都会产生一个新的历史记录，保存在<code>history</code>对象中。</p>
+<pre><code>location.replace(&#39;  &#39;):访问新的URL，并在历史记录中用新的URL替换掉当前的URL
+location.reload():重新加载当前页面
+location.reload(true):强制从服务器重新加载当前页面
+</code></pre><p>通过hashchange事件来监听hash值的变化。</p>
+<p>说完了location对象后就可以明白，HashRouter的实现原理就是：由于hash的变化不会导致页面重新加载，所以可以一边通过操作改变页面的hash值，一边通过监听页面hash值的变化来执行相应的操作。</p>
+<p>a标签也可以改变页面的hash值：</p>
+<pre><code>&lt;a href=&#39;#hash&#39;&gt;click&lt;/a&gt;
+</code></pre><h2 id="BrowserRouter"><a href="#BrowserRouter" class="headerlink" title="BrowserRouter"></a>BrowserRouter</h2><p>BrowserRouter是通过<code>history</code>对象实现的。<br><code>history</code>对象保存了当前页面的所有历史记录。</p>
+<pre><code>history.length    //历史记录的数量
+history.go()      //可以在历史记录中前后跳转
+history.back()    //向后跳转一个记录
+history.forward() //向前跳转一个记录
+</code></pre><p>在HTML5中又为history对象增添了新的方法和属性：</p>
+<pre><code>history.pushState()      //插入新的历史记录  
+history.replaceState()   //替换历史记录
+history.state            //当前历史记录的state对象
+</code></pre><p><code>history.pushState(state,label,path)</code>：向history中放入新的历史记录，可以看到该方法有三个参数:</p>
+<p><b><code>state</code>参数</b>：负责给当前历史记录的state属性传值(在上面可以看到history对象有一个state属性)，同时当触发popstate事件时，该事件对象的state属性就是上面的参数的副本。</p>
+<pre><code>history.pushState({name:1},&#39;&#39;,&#39;/a&#39;);
+history.state;     //{name:1}
+window.onpopstate = function(event){
+    event.state;   //{name:1}
+} 
+</code></pre><p><b><code>label</code>参数<b>：目前浏览器都忽略了这个参数。</b></b></p>
+<p><b><code>path</code>参数<b>：要存入的新的历史记录，可以是一整个URL，也可以是相对路径或绝对路径(模式与location.href属性相同),新旧历史记录必须<code>同源</code>，否则会报错。</b></b></p>
+<p><code>pushState不会触发hashChange事件,同时执行pushState会直接删除之后的所有历史记录</code></p>
+<p><b><code>history.replaceState(state,label,path)</code><b>：替换当前的历史记录，参数与pushState相同。</b></b></p>
+<p><code>popState事件</code>：当在历史记录中前进，后退，使用location.hash改变URL时都会触发该事件，但只有当所处的历史记录是由<code>pushState</code>放入或<code>replaceState</code>替换的时候，事件对象的state属性才是当前历史记录的state属性的副本。</p>
+<p>所以<code>history.pushState</code>和<code>history.replacestate</code>都可以在不刷新页面的情况下更改当前页面的URL。<br>但是这也会产生一定的问题：在改变了页面的URL后，如果刷新了页面，浏览器就会按照当前的URL向服务器发送请求，服务器中肯定没有对应的资源，就会导致刷新后显示404的情况，这就需要服务器做出一定的设置。</p>
+<h3 id="上面说完了实现的基本原理后，现在了解一下React-Router的具体用法："><a href="#上面说完了实现的基本原理后，现在了解一下React-Router的具体用法：" class="headerlink" title="上面说完了实现的基本原理后，现在了解一下React-Router的具体用法："></a>上面说完了实现的基本原理后，现在了解一下React-Router的具体用法：</h3><p>1、 <code>&lt;BrowserRouter&gt;</code><br>它就是通过history对象来实现路由的，下面列出了它的几个属性：</p>
 <pre><code>&lt;BrowserRouter basename=String
                getUserConfirmation=Function
                 forceRefresh=Boolean
@@ -151,8 +192,20 @@ forceRefresh：默认为false，表示当路由改变时是否刷新当前页面
 keyLength：在页面中每个URL都会对应一个location对象，在React-Router中每个location也都有一个key属性，每个key属性都不相同，可以通过key属性查找每个URL，keyLength就是用来设置key属性的长度，默认为6字节
 
 children：要渲染的唯一子节点
-</code></pre><p>2、<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">通过改变location.hash的值来实现路由功能的。</span><br><span class="line"></span><br><span class="line">	&lt;HashRouter basename=String</span><br><span class="line">				getUserConfirmation=Function</span><br><span class="line">				hashType=String</span><br><span class="line">				children=Node</span><br><span class="line">	&gt;</span><br><span class="line"></span><br><span class="line">	hashType：设置hash的类型，有三种：</span><br><span class="line">			  &apos;slash&apos;:#/，结果为：http://localhost/#/</span><br><span class="line">			  &apos;noslash&apos;:#,结果为：http://localhost/#</span><br><span class="line">			  &apos;hashbang&apos;:创建ajax可抓取的hash，例如#!/,结果为：http://localhost/#!/</span><br><span class="line">hashbang参考：https://blog.csdn.net/haodawang/article/details/73182309</span><br><span class="line"></span><br><span class="line">HashRouter中其他属性的作用与BrowserRouter的相同，</span><br><span class="line"></span><br><span class="line">3、```&lt;Route&gt;</span><br></pre></td></tr></table></figure></p>
-<p>Route组件的属性是：</p>
+</code></pre><p>2、<code>&lt;HashRouter&gt;</code><br>通过改变location.hash的值来实现路由功能的。</p>
+<pre><code>&lt;HashRouter basename=String
+            getUserConfirmation=Function
+            hashType=String
+            children=Node
+&gt;
+
+hashType：设置hash的类型，有三种：
+          &#39;slash&#39;:#/，结果为：http://localhost/#/
+          &#39;noslash&#39;:#,结果为：http://localhost/#
+          &#39;hashbang&#39;:创建ajax可抓取的hash，例如#!/,结果为：http://localhost/#!/
+</code></pre><p>hashbang参考：<a href="https://blog.csdn.net/haodawang/article/details/73182309" target="_blank" rel="noopener">https://blog.csdn.net/haodawang/article/details/73182309</a></p>
+<p>HashRouter中其他属性的作用与BrowserRouter的相同，</p>
+<p>3、<code>&lt;Route&gt;</code><br>Route组件的属性是：</p>
 <pre><code>&lt;Route exact 
        strict
        path=String
@@ -165,7 +218,7 @@ children：要渲染的唯一子节点
 
 exact：严格匹配
 
-strict：严格匹配&apos;/&apos;，如果不设置strict那么&apos;/index&apos;与&apos;/index/&apos;会认为匹配。
+strict：严格匹配&#39;/&#39;，如果不设置strict那么&#39;/index&#39;与&#39;/index/&#39;会认为匹配。
 
 path：匹配的路径
 
@@ -177,13 +230,19 @@ children：与render方法相同，唯一的区别就是不管路径是否匹配
 
 location：传入一个location对象，他可以和Route进行匹配
 例如：
-&lt;Route path=&apos;/test&apos; component={Test} location={{pathname:'/test'}}&gt;
+&lt;Route path=&#39;/test&#39; component={Test} location={{pathname:'/test'}}&gt;
 这时不管当前的路径是什么Route都会渲染，也就是说只要location属性或当前的路径任意一个和path匹配，那么就会渲染该组件。
 
 sensitive：是否区分路径大小写
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">	</span><br><span class="line">4、```&lt;Switch&gt;</span><br></pre></td></tr></table></figure>
-<p>其子节点是<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">	</span><br><span class="line">	&lt;Switch location=&lt;Object&gt;</span><br><span class="line">			children=&lt;Node&gt;</span><br><span class="line">	&gt;</span><br><span class="line"></span><br><span class="line">	location:接受一个location对象，他用来替换子节点进行匹配的location对象</span><br><span class="line">	children：子节点</span><br><span class="line"></span><br><span class="line">5、```&lt;Link&gt;</span><br></pre></td></tr></table></figure></p>
-<p>Link在改变URL的时候可以将一些属性传递给匹配成功的Route。</p>
+</code></pre><p><code>render，component，children的区别参见react-router源码</code></p>
+<p>4、<code>&lt;Switch&gt;</code><br>其子节点是<code>&lt;Route&gt;</code>或<code>&lt;Redirect&gt;</code>。属性为：</p>
+<pre><code>&lt;Switch location=&lt;Object&gt;
+        children=&lt;Node&gt;
+&gt;
+
+location:接受一个location对象，他用来替换子节点进行匹配的location对象
+children：子节点
+</code></pre><p>5、<code>&lt;Link&gt;</code><br>Link在改变URL的时候可以将一些属性传递给匹配成功的Route。</p>
 <pre><code>&lt;Link to=&lt;String&gt;或&lt;Object&gt;
       replace=&lt;Boolean&gt;
       innerRef=&lt;Function&gt;
@@ -202,12 +261,6 @@ pathname,search,hash表示要跳转的路径，state传递给匹配到的Route�
   </div>
 </article>
 
-    <div class="blog-post-comments">
-        <div id="disqus_thread">
-            <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        </div>
-    </div>
-
 
 
     </div>
@@ -220,17 +273,13 @@ pathname,search,hash表示要跳转的路径，state传递给匹配到的Route�
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#React-Router"><span class="toc-number">1.</span> <span class="toc-text">React-Router</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#路由实现"><span class="toc-number">1.</span> <span class="toc-text">路由实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HashRouter"><span class="toc-number">2.</span> <span class="toc-text">HashRouter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BrowserRouter"><span class="toc-number">3.</span> <span class="toc-text">BrowserRouter</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#上面说完了实现的基本原理后，现在了解一下React-Router的具体用法："><span class="toc-number">3.1.</span> <span class="toc-text">上面说完了实现的基本原理后，现在了解一下React-Router的具体用法：</span></a></li></ol></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -272,15 +321,12 @@ pathname,search,hash表示要跳转的路径，state传递给匹配到的Route�
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </nav>
   </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
 </footer>
 
 </body>
@@ -306,18 +352,5 @@ pathname,search,hash表示要跳转的路径，state传递给匹配到的Route�
         ga('send', 'pageview');
     </script>
 
-
-    <!-- Disqus Comments -->
-    <script type="text/javascript">
-        var disqus_shortname = 'atelier-cave-dark';
-
-        (function(){
-            var dsq = document.createElement('script');
-            dsq.type = 'text/javascript';
-            dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        }());
-    </script>
 
 

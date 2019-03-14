@@ -6,18 +6,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 ###async/await的实现 ####async函数async函数是使用执行器对生成器函数进行了包裹 as">
+    <meta name="description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 async/await的实现async函数async函数是使用执行器对生成器函数进行了包裹 async func">
 <meta name="keywords" content="async await">
 <meta property="og:type" content="article">
 <meta property="og:title" content="async&#x2F;await">
 <meta property="og:url" content="http://yoursite.com/2019/03/13/async-await/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 ###async/await的实现 ####async函数async函数是使用执行器对生成器函数进行了包裹 as">
+<meta property="og:description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 async/await的实现async函数async函数是使用执行器对生成器函数进行了包裹 async func">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-13T08:54:12.748Z">
+<meta property="og:updated_time" content="2019-03-13T11:52:15.301Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="async&#x2F;await">
-<meta name="twitter:description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 ###async/await的实现 ####async函数async函数是使用执行器对生成器函数进行了包裹 as">
+<meta name="twitter:description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 async/await的实现async函数async函数是使用执行器对生成器函数进行了包裹 async func">
     
     
         
@@ -57,11 +57,7 @@
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </span>
@@ -69,7 +65,7 @@
     <span id="actions">
       <ul>
         
-        <li><a class="icon" href="/2019/03/13/React-setState的异步与同步/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        <li><a class="icon" href="/2019/03/13/React-Router源码探析/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
         <li><a class="icon" href="/2019/03/13/节流与防抖/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
@@ -99,7 +95,7 @@
 
     </div>
     <div id="toc">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#async-await的实现"><span class="toc-number">1.</span> <span class="toc-text">async/await的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#async函数"><span class="toc-number">1.1.</span> <span class="toc-text">async函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内置的执行器"><span class="toc-number">1.2.</span> <span class="toc-text">内置的执行器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对题目的理解："><span class="toc-number">2.</span> <span class="toc-text">对题目的理解：</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -140,20 +136,19 @@
   <div class="content" itemprop="articleBody">
     <p>Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是<code>async/await</code>。</p>
 <p>在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。</p>
-<p>###async/await的实现</p>
-<p>####async函数<br>async函数是使用执行器对生成器函数进行了包裹</p>
+<h2 id="async-await的实现"><a href="#async-await的实现" class="headerlink" title="async/await的实现"></a>async/await的实现</h2><h3 id="async函数"><a href="#async函数" class="headerlink" title="async函数"></a>async函数</h3><p>async函数是使用执行器对生成器函数进行了包裹</p>
 <pre><code>async function example(){
-    let content = await readFile(&apos;ex.json&apos;);
+    let content = await readFile(&#39;ex.json&#39;);
 }
 
 就相当于：
 
 function example(){
     return run(function *(){
-        let content = yield readFile(&apos;ex.json&apos;);
+        let content = yield readFile(&#39;ex.json&#39;);
     })
 }
-</code></pre><p>####内置的执行器<br>在async/await中内置的执行器返回的是Promise对象。</p>
+</code></pre><h3 id="内置的执行器"><a href="#内置的执行器" class="headerlink" title="内置的执行器"></a>内置的执行器</h3><p>在async/await中内置的执行器返回的是Promise对象。</p>
 <p>执行器实现：</p>
 <pre><code>function runMaster(generator){
     return new Promise(function(resolve,reject){
@@ -190,8 +185,30 @@ function example(){
 2、返回值的value为true，表示生成器内部的逻辑已经执行完成，执行resolve，将Promise对象的状态改为fulfilled并返回。
 
 3、返回值的value为false，说明还需要继续执行next方法，那么就生成一个新的fulfilled状态的Promise对象，并将对next方法的调用作为onfulfilled函数放入then中(这样就会将onfulfilled函数放入微任务队列中)，并退出。
-</code></pre><p>###对题目的理解：<br>    async function async1() {<br>        console.log( ‘async1 start’ )<br>        await async2()<br>        console.log( ‘async1 end’ )<br>    }<br>    async function async2() {<br>        console.log( ‘async2’ );<br>        return Promise.resolve();<br>        }<br>    console.log( ‘script start’ )<br>    setTimeout( function () {<br>        console.log( ‘setTimeout’ )<br>    }, 0 )<br>    async1();<br>    new Promise( function ( resolve ) {<br>        console.log( ‘promise1’ )<br>        resolve();<br>    } ).then(function () {<br>        console.log( ‘promise2’ )<br>    } ).then(function () {<br>        console.log( ‘promise3’ )<br>    } )<br>    console.log( ‘script end’ )</p>
-<p>重点就是执行器中的这一句：</p>
+</code></pre><h2 id="对题目的理解："><a href="#对题目的理解：" class="headerlink" title="对题目的理解："></a>对题目的理解：</h2><pre><code>async function async1() {
+    console.log( &#39;async1 start&#39; )
+    await async2()            
+    console.log( &#39;async1 end&#39; )
+}
+async function async2() {
+    console.log( &#39;async2&#39; );
+    return Promise.resolve();
+    }
+console.log( &#39;script start&#39; )
+setTimeout( function () {
+    console.log( &#39;setTimeout&#39; )
+}, 0 )
+async1();
+new Promise( function ( resolve ) {
+    console.log( &#39;promise1&#39; )
+    resolve();
+} ).then(function () {
+    console.log( &#39;promise2&#39; )
+} ).then(function () {
+    console.log( &#39;promise3&#39; )
+} )
+console.log( &#39;script end&#39; )
+</code></pre><p>重点就是执行器中的这一句：</p>
 <pre><code>Promise.resolve(next.value).then(function(value){
                 step(iterator.next.bind(iterator,value))
             }).catch(function(err){
@@ -201,12 +218,6 @@ function example(){
 
   </div>
 </article>
-
-    <div class="blog-post-comments">
-        <div id="disqus_thread">
-            <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        </div>
-    </div>
 
 
 
@@ -220,17 +231,13 @@ function example(){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </div>
 
     <div id="toc-footer" style="display: none">
-      
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#async-await的实现"><span class="toc-number">1.</span> <span class="toc-text">async/await的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#async函数"><span class="toc-number">1.1.</span> <span class="toc-text">async函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内置的执行器"><span class="toc-number">1.2.</span> <span class="toc-text">内置的执行器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对题目的理解："><span class="toc-number">2.</span> <span class="toc-text">对题目的理解：</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
@@ -272,15 +279,12 @@ function example(){
          
           <li><a href="/">Home</a></li>
          
-          <li><a href="/about/">About</a></li>
-         
-          <li><a href="/posts/">Writing</a></li>
-         
-          <li><a href="http://github.com/sergodeeva">Projects</a></li>
+          <li><a href="http://github.com/clexerwang">Github</a></li>
         
       </ul>
     </nav>
   </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
 </footer>
 
 </body>
@@ -306,18 +310,5 @@ function example(){
         ga('send', 'pageview');
     </script>
 
-
-    <!-- Disqus Comments -->
-    <script type="text/javascript">
-        var disqus_shortname = 'atelier-cave-dark';
-
-        (function(){
-            var dsq = document.createElement('script');
-            dsq.type = 'text/javascript';
-            dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        }());
-    </script>
 
 
