@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。  History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。  如果感觉文章太长，可以直接看工作">
+<meta name="keywords" content="History,React-router">
+<meta property="og:type" content="article">
+<meta property="og:title" content="History库源码学习">
+<meta property="og:url" content="http://yoursite.com/2019/01/15/History库源码学习/index.html">
+<meta property="og:site_name" content="Clexer">
+<meta property="og:description" content="在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。  History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。  如果感觉文章太长，可以直接看工作">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-03-29T05:25:07.646Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="History库源码学习">
+<meta name="twitter:description" content="在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。  History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。  如果感觉文章太长，可以直接看工作">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>History库源码学习</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2019/03/13/HTTPS加密过程/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/01/15/History库源码学习/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/01/15/History库源码学习/&text=History库源码学习"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/01/15/History库源码学习/&is_video=false&description=History库源码学习"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=History库源码学习&body=Check out this article: http://yoursite.com/2019/01/15/History库源码学习/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/01/15/History库源码学习/&name=History库源码学习&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#createBrowserHistory"><span class="toc-number">1.</span> <span class="toc-text">createBrowserHistory</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#getDOMLocation"><span class="toc-number">1.1.</span> <span class="toc-text">getDOMLocation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#createLocation"><span class="toc-number">1.2.</span> <span class="toc-text">createLocation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#createKey"><span class="toc-number">1.3.</span> <span class="toc-text">createKey</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#checkDOMListeners"><span class="toc-number">1.4.</span> <span class="toc-text">checkDOMListeners</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#handlePopState"><span class="toc-number">1.5.</span> <span class="toc-text">handlePopState</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#handlePop"><span class="toc-number">1.6.</span> <span class="toc-text">handlePop</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#setState"><span class="toc-number">1.7.</span> <span class="toc-text">setState</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#createTransitionManager"><span class="toc-number">1.8.</span> <span class="toc-text">createTransitionManager</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#revertPop"><span class="toc-number">1.9.</span> <span class="toc-text">revertPop</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#listen"><span class="toc-number">1.10.</span> <span class="toc-text">listen</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#push"><span class="toc-number">1.11.</span> <span class="toc-text">push</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#通过pushState，replaceState改变时"><span class="toc-number">1.11.1.</span> <span class="toc-text">通过pushState，replaceState改变时</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#通过go-goBack-goForward-location-hash…等方法时"><span class="toc-number">1.11.2.</span> <span class="toc-text">通过go(),goBack(),goForward(),location.hash…等方法时</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#createHashHistory"><span class="toc-number">2.</span> <span class="toc-text">createHashHistory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#createMemoryHistory"><span class="toc-number">3.</span> <span class="toc-text">createMemoryHistory</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#createMemoryHistory-1"><span class="toc-number">3.1.</span> <span class="toc-text">createMemoryHistory</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#push-1"><span class="toc-number">3.2.</span> <span class="toc-text">push</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#go"><span class="toc-number">3.3.</span> <span class="toc-text">go</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        History库源码学习
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Clexer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2019-01-15T09:01:44.000Z" itemprop="datePublished">2019-01-15</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/History-React-router/">History,React-router</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <blockquote>
+<p>在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。</p>
+</blockquote>
+<p>History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。</p>
+<blockquote>
+<p>如果感觉文章太长，可以直接看<a href="####工作流程">工作流程</a>。</p>
+</blockquote>
+<p>History库的主函数一共有三个:<code>createBrowserHistory</code>，<code>createHashHistory</code>，<code>createMemoryHistory</code>。它们分别适用于不同的场景，这里先从<code>createBrowserHistory</code>说起：</p>
+<h3 id="createBrowserHistory"><a href="#createBrowserHistory" class="headerlink" title="createBrowserHistory"></a>createBrowserHistory</h3><p>createBrowserHistory函数非常长，但是大部分都是函数声明，它所做的事情很简单：初始化一个history对象。</p>
+<pre><code>##createBrowserHistory主要过程：
+
+  //判断是否为浏览器环境
+  invariant(canUseDOM, &#39;Browser history needs a DOM&#39;);
+  //判断是否支持history对象
+  const globalHistory = window.history;
+  const canUseHistory = supportsHistory();
+
+  //判断当改变hash值时是否会触发popState事件，如果会触发那么就不需要处理hashChange事件了，如果不能触发，那就需要使用hashChange事件来代替
+  const needsHashChangeListener = !supportsPopStateOnHashChange();
+
+  //读取相关的设置
+  const {
+    //是否直接刷新
+    forceRefresh = false,
+    //显示提示信息的函数
+    getUserConfirmation = getConfirmation,
+    //location.key的长度
+    keyLength = 6
+  } = props;
+  //如果有basename就生成标准的basename(以&#39;/&#39;开头，不以&#39;/&#39;结尾)
+  const basename = props.basename
+    ? stripTrailingSlash(addLeadingSlash(props.basename))
+    : &#39;&#39;;
+
+
+  //获取初始的location对象
+  //getHistoryState用来获取history.state
+  //getDOMLocation用来生成location对象，后面会详细讲
+  const initialLocation = getDOMLocation(getHistoryState());
+  let allKeys = [initialLocation.key];
+
+
+  //是否直接强制跳转
+  let forceNextPop = false;
+
+
+  //生成一个跳转管理器，他拥有：setPrompt，confirmTransitionTo，appendListener，notifyListeners
+  const transitionManager = createTransitionManager();
+
+
+  let listenerCount = 0;
+  let isBlocked = false;
+
+
+  const history = {
+    length: globalHistory.length,
+    action: &#39;POP&#39;,
+    location: initialLocation,
+    createHref,
+    push,
+    replace,
+    go,
+    goBack,
+    goForward,
+    block,
+    listen
+  };
+</code></pre><p>以上就是函数的主要过程，分为三部分：<br>1、判断环境并做兼容性处理<br>2、初始化相关变量<br>3、使用变量生成history并返回</p>
+<p>接着就来看一下里面声明的各个函数的作用：</p>
+<h4 id="getDOMLocation"><a href="#getDOMLocation" class="headerlink" title="getDOMLocation"></a>getDOMLocation</h4><pre><code>function getDOMLocation(historyState){
+    //为要生成的location对象获取key和state
+    const {key,state} = historyState;
+    //为要生成的location对象获取对应的路径属性值
+    const {pathname,search,hash} = window.location;
+
+    //组合路径
+    let path = pathname+search+hash;
+    //如果设置了basename，但是路径开头与basename不同，就报错
+    warning( !(basename &amp;&amp; hasBasename ( path, basename )),&#39;wrong&#39;);
+
+    //生成的location对象的的path不能包含basename部分
+    if(basename) path = stripBasename(path,basename)
+
+    //将获得参数传入createLocation，开始生成location对象
+    return createLocation(path,state,key)
+}
+</code></pre><p>可以看到getDOMLocation主要是为生成location对象作处理参数的工作，每个location对象都有<code>key，state，pathname，search，hash</code>这些属性。<code>key</code>和<code>state</code>就来自于原生history的state中。<code>pathname，search，hash</code>来自于location的路径信息中，而且这个路径不包含basename部分。</p>
+<h4 id="createLocation"><a href="#createLocation" class="headerlink" title="createLocation"></a>createLocation</h4><p>createLocation函数比较长，不过内容比较简单，就是根据传入的参数生成一个新的location对象。</p>
+<pre><code>function createLocation(path,state,key,currentLocation){
+    let location; 
+
+    //如果传入的路径信息不是对象类型，就是用parsePath将它拼装成对象形式
+    if(typeof path === &#39;string&#39;){
+        location = parsePath(path);
+        location.state = state;
+    }else{
+        //如果是对象形式的，直接解构
+        location = {...path};
+        //下面这一段用来设置pathname,search,hash,state的默认值
+        if(location.pathname === undefined ) location.pathname = &#39;&#39;;
+        if(location.search){
+            if(location.search.charAt(0)!== &#39;?&#39;){
+                location.search = ? + location.search;
+            }
+        }else{
+            location.search = &#39;&#39;;
+        }                
+        if(location.hash){
+            if(location.hash.charAt(0) !== &#39;#&#39;){
+                location.hash = &#39;#&#39;+location.hash;
+            }
+        }else{
+            location.hash = &#39;&#39;;
+        }
+        //如果有state，就设置location的state
+        if(state !== undefined &amp;&amp; location.state === undefined){
+            location.state = state;
+        }
+    }
+    try{
+        location.pathname = encodedURI(location.pathname)
+    }catch(e){
+        throw e;
+    }
+
+
+    //currentLocation存在，说明将要从一个历史记录跳转到一个新的历史记录。
+    if(currentLocation){
+        //如果没有传入新的路径参数，则默认使用当前路径
+        if(!location.pathname){
+            location.pathname = currentLocation.pathname;
+            //如果新的pathname不是以‘/’开头
+        }else if(location.pathname.charAt(0) !== &#39;/&#39;){
+            //根据新的pathname使用resolvePathname计算新的路径
+            location.pathname = resolvePathname(location.pathname,currentLocation.pathname)
+        }
+    }else{
+        if(!location.pathname){
+            location.pathname = &#39;/&#39;;
+        }
+    }
+
+    return location;
+
+}
+</code></pre><p>可以看到location对象有pathname，search，hash，key，state这几个属性。</p>
+<h4 id="createKey"><a href="#createKey" class="headerlink" title="createKey"></a>createKey</h4><p>这个函数用来生成随机的key值，在history中每个location对象都会有一个key值，可以用来对location进行检索。当要跳转时可以快速找到对应的location对象。</p>
+<pre><code> function createKey() {
+    //keyLength，用户设置的key长度
+    return Math.random().toString(36).substr(2, keyLength);
+}
+</code></pre><h4 id="checkDOMListeners"><a href="#checkDOMListeners" class="headerlink" title="checkDOMListeners"></a>checkDOMListeners</h4><pre><code>//用来绑定popState的事件处理函数
+//其中的handleHashChange函数，用于处理IE10和IE11在hash改变时，不能触发popstate事件的备选方案
+function checkDOMListeners(delta) {
+    listenerCount += delta;
+    if (listenerCount === 1 &amp;&amp; delta === 1) {
+        window.addEventListener(PopStateEvent, handlePopState);
+        if (needsHashChangeListener)
+            window.addEventListener(HashChangeEvent, handleHashChange);
+        } else if (listenerCount === 0) {
+            window.removeEventListener(PopStateEvent, handlePopState);
+            if (needsHashChangeListener)
+            window.removeEventListener(HashChangeEvent, handleHashChange);
+    }
+}
+</code></pre><p>可以看到当delta是1时表示要绑定事件处理函数，-1肯定就是要解除绑定。<br>这里的if是用来保证多次绑定时只绑定一次，多次解绑时只要不为0，就说明还需要使用就不会解绑。</p>
+<p>接着看一下这个事件处理函数干了什么：</p>
+<h4 id="handlePopState"><a href="#handlePopState" class="headerlink" title="handlePopState"></a>handlePopState</h4><pre><code>function handlePopState (event) {
+    handlePop(getDOMLocation(event.state))    
+}
+</code></pre><p>这里只是创建了一个新的location对象，还要接着看handlePop</p>
+<h4 id="handlePop"><a href="#handlePop" class="headerlink" title="handlePop"></a>handlePop</h4><p>处理popState事件的主函数</p>
+<pre><code>function handlePop(location){
+
+    if(forceNextPop){
+        forceNextPop = false;
+        setState()；
+    }else{
+        const action = &#39;POP&#39;;
+        transitionManager.confirmTransitionTo(location,
+                                              action,
+                                              getUserConfirmation,
+                                              function(ok){
+                                                    if(ok) setState({action,location})
+                                                    else revertPop(location)
+                                              })
+
+    }
+}
+</code></pre><p>handlePop所做的就是执行setState或者执行<code>transitionManager.confirmTransitionTo</code>。函数中有一个forceNextPop变量，它的作用在下面再讲。</p>
+<h4 id="setState"><a href="#setState" class="headerlink" title="setState"></a>setState</h4><pre><code>const setState = function(nextState){
+    //更新history对象        
+    Object.assign(history, nextState);
+    history.length = globalHistory.length;
+
+    //依次执行每个监听函数，传入新的location对象和action对象
+    transitionManager.notifyListeners(history.location, history.action);
+  };    
+</code></pre><p>在handlePop中执行的另一个函数就是<code>transitionManager.confirmTransitionTo</code>，在这之前就需要看一下<code>createTransitionManager</code>。</p>
+<h4 id="createTransitionManager"><a href="#createTransitionManager" class="headerlink" title="createTransitionManager"></a>createTransitionManager</h4><p><code>createTransitionManager</code>用来生成TransitionManager对象，它主要负责控制路径变化，拥有<code>setPrompt</code>，<code>confirmTransitionTo</code>，<code>appendListener</code>，<code>notifyListeners</code>方法，分别用来添加提示信息，管理拦截信息的显示，添加监听路由变化的函数，执行监听函数。</p>
+<pre><code>function createTransitionManager(){
+    let prompt = null;
+    //prompt指要显示的提示信息，可以是函数或者字符串类型。
+    const setPrompt = function(nextPrompt){
+        warning(prompt == null,&#39;warning&#39;);
+
+        prompt = nextPrompt;
+        //返回可以取消prompt的函数
+        return ()=&gt;{
+            if(prompt === nextPrompt) prompt = null;
+        }
+    }
+
+    //主要用来显示提示信息，并进行路由的跳转
+    //getUserConfirm就是用来显示提示信息的函数，默认使用window.confirm
+    //callback是显示完提示信息后的执行的函数
+    const confirmTransitionTo = function(location,action,getUserConfirm,callback){
+        if(prompt !== null){
+            //如果prompt是函数类型，那就执行prompt获得要显示的提示信息。
+            const result = typeof prompt === &#39;function&#39;?prompt(location,action):prompt;
+
+            //如果提示信息是字符串类型（可以直接显示）
+            if(typeof result === &#39;string&#39;){
+                //判断有没有显示提示信息的函数
+                if(typeof getUserConfirmation === &#39;function&#39;){
+                    //在getUserConfirmation中会执行callback
+                    getUserConfirmation(result,callback)
+                }else{
+                    //如果传入了提示信息，但是没有显示提示信息的函数，则报错
+                    warning(false,&#39;warning&#39;);
+                    //执行回调函数，一般回调函数的作用都是用来进行路由跳转的
+                    callback(true);
+                }
+            }else{
+                //如果要显示的信息不是字符串类型，但不是空值，那么也可以进行跳转
+                //也就是说可以通过控制prompt的返回值来控制页面是否跳转
+                callback(result !== false);
+            }
+        }else{
+            //如果prompt是空，说明不需要显示提示信息，那么直接跳转
+            callback(true);
+        }
+    }
+
+    //存储监听路由变化函数
+    let listeners =[];
+
+    //插入监听函数
+    const appendListener = function(fn){
+        //判断该监听函数能否执行，主要是防止监听函数之间相互取消
+        let isActive = true;
+
+        let listener = (...args)=&gt;{
+            if(isActive) fn(...args)
+        }
+
+        listeners.push(listener);
+        //返回取消监听函数的函数
+        return function(){
+            isActive = false;
+            //将被取消的监听函数从listeners中筛掉
+            listeners = listeners.filter(eve=&gt;eve !== listener)
+        }
+    }
+
+    const notifyListeners=function(...args){
+        listeners.forEach((listener)=&gt;listener(...args))
+    }
+
+    return {
+        setPrompt,
+        confirmTransitionTo,
+        appendListener,
+        notifyListeners
+    }
+}
+</code></pre><p>可以看到在进行路由跳转时先判断是否要现实提示信息，如果不需要那么就直接跳转，否则需要根据提示信息的返回值来判断是否跳转，如果提示信息返回false，那么就要返回原路由，这就需要执行revertPop函数：</p>
+<h4 id="revertPop"><a href="#revertPop" class="headerlink" title="revertPop"></a>revertPop</h4><pre><code>//fromLocation表示从哪来，toLocation表示要到哪里去
+//revertPop函数是当prompt返回false时执行的，也就是跳转失败
+//fromLocation是本来要跳转到的location，由于跳转失败所以需要再跳转回现在的location
+function revertPop(fromLocation){
+    //只有当跳转成功时才会执行setState更新history中的location和action
+    //所以现在history.location中仍然是跳转前的location
+    const toLocation = history.location;
+    //找到跳转前的location在数组中的位置
+    let toIndex = allKeys.indexOf(toLocation.key);
+
+    //判断两个location是否至少有一个存在且互不相等
+    if (toIndex === -1) toIndex = 0;
+    let fromIndex = allKeys.indexOf(fromLocation.key);
+    if (fromIndex === -1) fromIndex = 0;
+
+    const delta = toIndex - fromIndex;
+    //如果至少有一个存在且互不相等
+    if (delta) {
+      //忽略block，立即跳转
+      forceNextPop = true;
+      go(delta);
+    }
+};
+</code></pre><p>###go<br>go函数就是原生的history.go方法</p>
+<pre><code>function go(delta){
+    globalHistory.go(delta);
+}
+</code></pre><p>其余的还有goBack，goForward方法</p>
+<p>###block<br>block函数主要用来给页面添加提示信息。</p>
+<pre><code>function block(prompt=false){
+    //通过setPrompt添加提示信息
+    const unblock = transitionManager.setPrompt(prompt);
+
+    //通过isBlocked判断当前是否已经绑定了事件处理程序
+    if (!isBlocked) {
+        //绑定事件处理程序，这样当页面触发了popState或hashchange事件时，就会执行对应的事件处理函数
+        checkDOMListeners(1);
+        //isBlocked表示当前页面已经添加了提示信息和事件处理程序
+        isBlocked = true;
+     }
+
+     return () =&gt; {    
+         if (isBlocked) {
+             //重置isBlocked
+             isBlocked = false;
+             //移除事件处理程序
+             checkDOMListeners(-1);
+         }
+         //清除prompt
+         return unblock();
+      };
+}
+</code></pre><p>可以看到block函数做了两个事情，添加提示信息，绑定事件处理程序。这两个事情是不相关的，setPrompt只是单纯的添加提示信息，checkDOMListeners只是为页面添加事件处理函数，只是在事件处理函数中如果发现页面添加了提示信息那么会根据提示信息的返回值确定是否要跳转，如果没有添加提示信息，那么就直接跳转。</p>
+<h4 id="listen"><a href="#listen" class="headerlink" title="listen"></a>listen</h4><pre><code>function listen(listener){
+    //listener放入监听数组中，返回一个可以取消监听函数的回调
+    const unlisten = transitionManager.appendListener(listener);
+    //为当前页面添加事件处理函数
+    checkDOMListeners(1);
+
+
+    return () =&gt; {
+        checkDOMListeners(-1);
+        unlisten();
+    };
+}
+</code></pre><h4 id="push"><a href="#push" class="headerlink" title="push"></a>push</h4><p>push函数是History看库对原生pushState方法的包装，通过执行transitionManager.confirmTransitionTo进行正常的跳转，代码就不贴了，比较简单。<br>对应的还有replace函数，也是进行跳转的方法，与push不同的是replace是替换当前记录，push是产生新记录并清空之后的所有记录。而对于记录的查找就使用location对象的key属性。</p>
+<p><a name="工作流程">工作流程</a><br>注意：<code>History</code>库所生成的history对象称为<code>库history</code>，window对象的称为<code>原生history</code>。<br><code>库history</code>依靠History中的<code>setState</code>函数来更新自己的值，所以<code>库history</code>并不总是包含最新的location。</p>
+<p>1、首先页面需要执行<code>createBrowserHistory</code>生成初始化<code>库history</code>对象，通过<code>库history.listen</code>注册路由成功跳转后的回调函数。也可以通过<code>block</code>注册路由跳转时的提示信息。<br>2、页面路由改变有两种形式：通过<code>pushState</code>，<code>replaceState</code>改变和通过<code>go()</code>,<code>goBack()</code>,<code>goForward()</code>方法改变。</p>
+<h5 id="通过pushState，replaceState改变时"><a href="#通过pushState，replaceState改变时" class="headerlink" title="通过pushState，replaceState改变时"></a>通过<code>pushState</code>，<code>replaceState</code>改变时</h5><p>1、当调用<code>push()</code>,<code>replace()</code>方法时会传入<code>目的路由</code>，然后在History中会根据<code>目的路由</code>生成新的location对象。<br>2、接着开始执行页面提示函数，根据页面提示的返回值判断是否要跳转至<code>目的路由</code>。<br>3、如果要跳转，那么就会执行<code>原生history</code>的pushState或replaceState方法，生成新的历史记录改变<code>原生history</code>的值。<br>4、执行<code>setState</code>方法：用新的location对象更新<code>库history</code>的值。然后依次执行页面的跳转监听函数,完成跳转。</p>
+<h5 id="通过go-goBack-goForward-location-hash…等方法时"><a href="#通过go-goBack-goForward-location-hash…等方法时" class="headerlink" title="通过go(),goBack(),goForward(),location.hash…等方法时"></a>通过<code>go()</code>,<code>goBack()</code>,<code>goForward()</code>,<code>location.hash</code>…等方法时</h5><p>这种方法主要依靠触发<code>popstate</code>事件，通过<code>popstate</code>的事件处理函数来执行路由跳转后的回调函数。<br>popstate的事件处理函数是在：设置<code>页面提示信息-prompt()</code>或<code>设置跳转监听函数-listen()</code>时设置的</p>
+<p>1、触发<code>popstate</code>事件，执行事件处理函数。此时<code>原生history</code>的值已经改变，路由也已经跳转。但是<code>库history</code>的值还没有更新。</p>
+<p>2、在事件处理函数中，根据<code>原生history</code>的值生成新的location对象。<br>3、然后通过<code>forceNextPop</code>来判断当前过程是快速回跳，还是一个正常的路由跳转。</p>
+<blockquote>
+<p>当触发了popstate事件时，此时路由已经跳转，在正常流程中接着会显示提示信息，如果提示信息返回false，即不允许跳转，那么此时还要通过go()方法跳转回之前的历史记录(因为此时<code>库history</code>还没有更新，所以可以通过<code>库history</code>中的值来找到之前历史记录的位置)。在执行go()方法时也会触发<code>popstate</code>事件，那么就通过<code>forceNextPop</code>来表示这次的<code>popstate</code>是一次快速回跳，<code>库history</code>的值已经是目标值来不需要更新，所以<code>setState</code>中没有参数。<br>为什么仍然要执行setState呢？应该是给了页面处理拒绝跳转后情况的能力。</p>
+</blockquote>
+<p>4、如果是正常的路由跳转，那么就显示提示信息，根据提示信息判断是否要跳转。<br>5、如果拒绝跳转，就通过<code>库history</code>找到上一条历史记录的位置，执行go()方法进行跳转，并将forceNextPop设为true。<br>6、如果同意跳转，就执行<code>setState</code>更新<code>库history</code>的值，并执行页面的监听函数，完成跳转。</p>
+<h3 id="createHashHistory"><a href="#createHashHistory" class="headerlink" title="createHashHistory"></a>createHashHistory</h3><p>它的过程与<code>createBrowserHistory</code>大致相同，只不过在<code>createHashHistory</code>中监听的是<code>hashchange</code>事件。<br>可以通过<code>location.hash</code>,<code>go()</code>,<code>goForward()</code>,<code>goBack()</code>来触发<code>hashchange</code>事件。</p>
+<pre><code>##createBrowserHistory主过程
+
+const globalHistory = window.history;
+//判断执行go()时是否会导致页面重新加载
+const canGoWithoutReload = supportsGoWithoutReloadUsingHash();
+
+//默认hash类型为slash
+const { getUserConfirmation = getConfirmation, hashType = &#39;slash&#39; } = props;
+const basename = props.basename
+    ? stripTrailingSlash(addLeadingSlash(props.basename))
+    : &#39;&#39;;
+
+//根据hash类型获取对应的编码解码方式
+const { encodePath, decodePath } = HashPathCoders[hashType];
+
+const transitionManager = createTransitionManager();
+
+let forceNextPop = false;
+let ignorePath = null;
+
+//获取hash
+const path = getHashPath();
+//转换hash格式
+const encodedPath = encodePath(path);
+//如果转换前后格式不一致，就替换
+if (path !== encodedPath) replaceHashPath(encodedPath);
+
+//生成location对象
+const initialLocation = getDOMLocation();
+
+//保存路径历史
+let allPaths = [createPath(initialLocation)];
+
+let listenerCount = 0;
+let isBlocked = false;
+
+const history = {
+    length: globalHistory.length,
+    action: &#39;POP&#39;,
+    location: initialLocation,
+    createHref,
+    push,
+    replace,
+    go,
+    goBack,
+    goForward,
+    block,
+    listen
+};
+return history;
+</code></pre><p><code>createHashHistory</code>主要做了：生成初始化location对象，设置hash的格式并按照格式转换。</p>
+<p>其它函数的过程大致相同，这里只说几个要注意的地方：<br>1、<code>ignorePath</code><br>当你在更改hash时会触发hashchange事件，比如在push方法中更改hash，由于push方法中已经有了路由跳转的处理过程，那么在hashchange的事件处理函数中就不需要再执行一次，所以就可以把hash设置为<code>ignorePath</code>，在事件处理函数中判断当前的hash是否需要忽略。<br>2、forceNextPop<br>作用与browserHistroy中相同，都是在prompt返回false时用来进行快速回跳。</p>
+<h3 id="createMemoryHistory"><a href="#createMemoryHistory" class="headerlink" title="createMemoryHistory"></a>createMemoryHistory</h3><p>MemoryHistory所做的就是自己维护一个历史记录队列并实现来相关的方法，不依赖浏览器history对象。只可以通过自己指定的方法进行路由跳转：push()，replace，go()，goBack，goForeard()。</p>
+<h4 id="createMemoryHistory-1"><a href="#createMemoryHistory-1" class="headerlink" title="createMemoryHistory"></a>createMemoryHistory</h4><pre><code>const {
+    getUserConfirmation,
+    initialEntries = [&#39;/&#39;],//自己维护的历史记录队列
+    initialIndex = 0,   //当前历史记录在队列中的索引
+    keyLength = 6
+} = props;
+
+const transitionManager = createTransitionManager();
+//计算初始记录的索引，这里clamp保证当前历史记录不会超出队列
+const index = clamp(initialIndex, 0, initialEntries.length - 1);
+//把历史记录都转换成location对象
+const entries = initialEntries.map(
+    entry =&gt;
+    typeof entry === &#39;string&#39;
+    ? createLocation(entry, undefined, createKey())
+    : createLocation(entry, undefined, entry.key || createKey())
+);
+
+
+const createHref = createPath;
+
+const history = {
+    length: entries.length,
+    action: &#39;POP&#39;,
+    location: entries[index],
+    index,
+    entries,
+    createHref,
+    push,
+    replace,
+    go,
+    goBack,
+    goForward,
+    canGo,
+    block,
+    listen
+};
+</code></pre><p>因为只能靠指定的方法进行路由跳转，所以不再需要设置事件处理函数。但是页面跳转的流程与之前相同：生成新的location对象，判断是否能进行跳转，如果可以就将新的location加入到历史记录队列中，然后通过执行setState更新history，并执行页面的监听函数。</p>
+<p>这里说一下push函数和go函数：</p>
+<h4 id="push-1"><a href="#push-1" class="headerlink" title="push"></a>push</h4><pre><code>function push(){
+    const action = &#39;PUSH&#39;;
+    const location = createLocation(path, state, createKey(), history.location);
+
+    transitionManager.confirmTransitionTo(
+        location,
+        action,
+        getUserConfirmation,
+        ok =&gt; {
+            if (!ok) return;
+            //当前索引
+            const prevIndex = history.index;
+            //新索引
+            const nextIndex = prevIndex + 1;
+
+            const nextEntries = history.entries.slice(0);
+            //如果索引在队列内部，按照push处理，清除以后的所有记录
+            if (nextEntries.length &gt; nextIndex) {
+                nextEntries.splice(
+                nextIndex,
+                nextEntries.length - nextIndex,
+                location
+                );
+            } else {
+                nextEntries.push(location);
+            }
+
+            setState({
+                action,
+                location,
+                index: nextIndex,
+                entries: nextEntries
+            });
+        }
+    )
+}
+</code></pre><h4 id="go"><a href="#go" class="headerlink" title="go"></a>go</h4><p>go方法与之前有些不同，因为不依赖浏览器，所以要自己实现go方法：</p>
+<pre><code>function go(n) {
+    //计算新的记录的索引，保证他不超过范围
+    const nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
+
+    const action = &#39;POP&#39;;
+    //获取记录的location对象
+    const location = history.entries[nextIndex];
+
+    transitionManager.confirmTransitionTo(
+      location,
+      action,
+      getUserConfirmation,
+      ok =&gt; {
+        if (ok) {
+          setState({
+            action,
+            location,
+            index: nextIndex
+          });
+        } else {
+          setState();
+        }
+      }
+    );
+}
+</code></pre><p>其他的过程与BrowserHistery中所讲的相同。这三个函数都是大同小异，区别在于路由跳转时触发的事件不尽相同。在看完来History后，react-router的源码就很容易明白了。</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#createBrowserHistory"><span class="toc-number">1.</span> <span class="toc-text">createBrowserHistory</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#getDOMLocation"><span class="toc-number">1.1.</span> <span class="toc-text">getDOMLocation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#createLocation"><span class="toc-number">1.2.</span> <span class="toc-text">createLocation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#createKey"><span class="toc-number">1.3.</span> <span class="toc-text">createKey</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#checkDOMListeners"><span class="toc-number">1.4.</span> <span class="toc-text">checkDOMListeners</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#handlePopState"><span class="toc-number">1.5.</span> <span class="toc-text">handlePopState</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#handlePop"><span class="toc-number">1.6.</span> <span class="toc-text">handlePop</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#setState"><span class="toc-number">1.7.</span> <span class="toc-text">setState</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#createTransitionManager"><span class="toc-number">1.8.</span> <span class="toc-text">createTransitionManager</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#revertPop"><span class="toc-number">1.9.</span> <span class="toc-text">revertPop</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#listen"><span class="toc-number">1.10.</span> <span class="toc-text">listen</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#push"><span class="toc-number">1.11.</span> <span class="toc-text">push</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#通过pushState，replaceState改变时"><span class="toc-number">1.11.1.</span> <span class="toc-text">通过pushState，replaceState改变时</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#通过go-goBack-goForward-location-hash…等方法时"><span class="toc-number">1.11.2.</span> <span class="toc-text">通过go(),goBack(),goForward(),location.hash…等方法时</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#createHashHistory"><span class="toc-number">2.</span> <span class="toc-text">createHashHistory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#createMemoryHistory"><span class="toc-number">3.</span> <span class="toc-text">createMemoryHistory</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#createMemoryHistory-1"><span class="toc-number">3.1.</span> <span class="toc-text">createMemoryHistory</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#push-1"><span class="toc-number">3.2.</span> <span class="toc-text">push</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#go"><span class="toc-number">3.3.</span> <span class="toc-text">go</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/01/15/History库源码学习/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/01/15/History库源码学习/&text=History库源码学习"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/01/15/History库源码学习/&is_video=false&description=History库源码学习"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=History库源码学习&body=Check out this article: http://yoursite.com/2019/01/15/History库源码学习/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/01/15/History库源码学习/&title=History库源码学习"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/01/15/History库源码学习/&name=History库源码学习&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 ___
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+
