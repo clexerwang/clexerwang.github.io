@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Clexer">
 <meta property="og:description" content="在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。  History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。  如果感觉文章太长，可以直接看工作">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-29T05:25:07.646Z">
+<meta property="og:updated_time" content="2019-03-29T05:37:03.093Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="History库源码学习">
 <meta name="twitter:description" content="在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。  History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。  如果感觉文章太长，可以直接看工作">
@@ -137,7 +137,7 @@
 </blockquote>
 <p>History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。</p>
 <blockquote>
-<p>如果感觉文章太长，可以直接看<a href="####工作流程">工作流程</a>。</p>
+<p>如果感觉文章太长，可以直接看<a href="#工作流程">工作流程</a>。</p>
 </blockquote>
 <p>History库的主函数一共有三个:<code>createBrowserHistory</code>，<code>createHashHistory</code>，<code>createMemoryHistory</code>。它们分别适用于不同的场景，这里先从<code>createBrowserHistory</code>说起：</p>
 <h3 id="createBrowserHistory"><a href="#createBrowserHistory" class="headerlink" title="createBrowserHistory"></a>createBrowserHistory</h3><p>createBrowserHistory函数非常长，但是大部分都是函数声明，它所做的事情很简单：初始化一个history对象。</p>
