@@ -1095,7 +1095,7 @@ article .content .video-container embed {
 }
 article .content blockquote {
   background: inherit;
-  color: #8fbc8f;
+  color: #436eee;
   border-left: 0px solid #ccc;
   margin: 1rem 10px;
   padding: 0.5em 10px;
@@ -1396,6 +1396,7 @@ code {
   border-radius: 2px;
   background: #eee;
   padding: 0 5px;
+  color: #ff6347;
 }
 pre code {
   border: none;
