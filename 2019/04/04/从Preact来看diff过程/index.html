@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="React的diff策略： 1、Dom节点的跨层级移动很少，可以忽略不计 2、拥有相同类型的两个组价将会生成相似的树形结构，不同类型的组件将会生成不类型的树形结构 3、对于同一层级的子节点，可以通过唯一id进行区分。 diff算法： 1、对树进行分层比较，两棵树只会对同一层次进行比较，这样只需一次遍历就能完成对整棵树的比较。 2、对于同类型的节点，则继续向下比较子节点。如果节点类型不同则直接卸载该">
+<meta name="keywords" content="React全家桶 Preact">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Preact来看diff过程">
+<meta property="og:url" content="http://yoursite.com/2019/04/04/从Preact来看diff过程/index.html">
+<meta property="og:site_name" content="Clexer">
+<meta property="og:description" content="React的diff策略： 1、Dom节点的跨层级移动很少，可以忽略不计 2、拥有相同类型的两个组价将会生成相似的树形结构，不同类型的组件将会生成不类型的树形结构 3、对于同一层级的子节点，可以通过唯一id进行区分。 diff算法： 1、对树进行分层比较，两棵树只会对同一层次进行比较，这样只需一次遍历就能完成对整棵树的比较。 2、对于同类型的节点，则继续向下比较子节点。如果节点类型不同则直接卸载该">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1g1qfg7f9ytj318k0t0dva.jpg">
+<meta property="og:updated_time" content="2019-04-04T04:16:01.210Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从Preact来看diff过程">
+<meta name="twitter:description" content="React的diff策略： 1、Dom节点的跨层级移动很少，可以忽略不计 2、拥有相同类型的两个组价将会生成相似的树形结构，不同类型的组件将会生成不类型的树形结构 3、对于同一层级的子节点，可以通过唯一id进行区分。 diff算法： 1、对树进行分层比较，两棵树只会对同一层次进行比较，这样只需一次遍历就能完成对整棵树的比较。 2、对于同类型的节点，则继续向下比较子节点。如果节点类型不同则直接卸载该">
+<meta name="twitter:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1g1qfg7f9ytj318k0t0dva.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>从Preact来看diff过程</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2019/03/13/setState的异步与同步/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/04/04/从Preact来看diff过程/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&text=从Preact来看diff过程"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&is_video=false&description=从Preact来看diff过程"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=从Preact来看diff过程&body=Check out this article: http://yoursite.com/2019/04/04/从Preact来看diff过程/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&name=从Preact来看diff过程&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#diff函数"><span class="toc-number">1.</span> <span class="toc-text">diff函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#idiff函数"><span class="toc-number">2.</span> <span class="toc-text">idiff函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#innerDiffNode函数"><span class="toc-number">3.</span> <span class="toc-text">innerDiffNode函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#buildComponentFromVNode"><span class="toc-number">4.</span> <span class="toc-text">buildComponentFromVNode</span></a></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#setComponentProps"><span class="toc-number"></span> <span class="toc-text">setComponentProps</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#renderComponent"><span class="toc-number">1.</span> <span class="toc-text">renderComponent:</span></a></li></ol>
+    </li></div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        从Preact来看diff过程
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Clexer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2019-04-04T04:14:31.000Z" itemprop="datePublished">2019-04-04</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React全家桶-Preact/">React全家桶 Preact</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>React的diff策略：</p>
+<pre><code>1、Dom节点的跨层级移动很少，可以忽略不计
+2、拥有相同类型的两个组价将会生成相似的树形结构，不同类型的组件将会生成不类型的树形结构
+3、对于同一层级的子节点，可以通过唯一id进行区分。
+</code></pre><p>diff算法：</p>
+<pre><code>1、对树进行分层比较，两棵树只会对同一层次进行比较，这样只需一次遍历就能完成对整棵树的比较。
+2、对于同类型的节点，则继续向下比较子节点。如果节点类型不同则直接卸载该节点。
+3、对同层级的子节点，根据唯一id判断需要保留的节点，在通过移动，删除和插入操作完成对节点的排列顺序的调整。
+</code></pre><p>Preact的diff过程依照了react的diff策略与算法，所以通过Preact也可以观察到到diff的流程与具体细节：</p>
+<blockquote>
+<p>这里只是梳理一下Preact中diff的大致流程，建议配合源码食用（我在源码中做了大量的注释，对每个参数的作用都做了详细的解释，保证看完就能弄清楚Preact的整个流程,/(ㄒoㄒ)/~~）</p>
+</blockquote>
+<p>入口为render函数，在render函数中直接调用了diff函数，所以这里从diff函数说起：</p>
+<h4 id="diff函数"><a href="#diff函数" class="headerlink" title="diff函数"></a>diff函数</h4><pre><code>首先，通过diffLevel来标识diff的深度，如果diffLevel为0，就表示进入diff，并将diffLevel加1。
+SvgMode表示当前参与diff的真实dom是否为SVG类型，hydrating表示当前参与diff的真实dom存在且是首次进行diff。
+
+之后，调用idiff函数，传入真实dom，vnode，context，mountAll，componentRoot
+idiff函数是整个diff过程的真正起点，它返回已经diff完成的真实dom。
+然后将idiff返回的真实dom插入到父节点中，之后将diffLevel减1，如果diffLevel变为0，说明diff已完成，要退出diff，此时根据componentRoot来判断当前是挂载过程还是更新过程：
+如果diffLevel为0，componentRoot为false，则为首次挂载完成，可以触发钩子函数。
+如果diffLevel为0，componentRoot为true，说明当前处于触发更新的组件的更新过程中，还不能触发钩子函数。
+</code></pre><h4 id="idiff函数"><a href="#idiff函数" class="headerlink" title="idiff函数"></a>idiff函数</h4><pre><code>它是diff过程的真正起点，根据虚拟dom的类型进行不同的处理。
+先将空的和布尔类型的虚拟dom置为空字符串；
+如果虚拟dom类型为字符和数字，
+这里进行了一次优化，如果虚拟dom和真实dom都是字符串，那么就直接替换真实dom的值。
+如果真实dom不是文本节点，那么就根据虚拟dom创建文本节点，然后再用创建的节点替换真实dom的位置，回收真实dom，返回处理完的文本节点。
+
+如果虚拟dom类型为组件类型，执行buildComponentFromVNode传入真实dom和vnode并将获得的值返回。
+
+如果虚拟dom是原生类型：
+如果真实dom和虚拟dom类型不相同，则使用由虚拟dom创建的实例替换真实dom，并回收真实dom。
+接着开始对dom的子节点进行diff过程，执行innerDiffNode函数。
+在对子节点diff完成后，需要根据虚拟dom的属性来更新父元素的属性，之后将diff完成的节点返回。
+</code></pre><h4 id="innerDiffNode函数"><a href="#innerDiffNode函数" class="headerlink" title="innerDiffNode函数"></a>innerDiffNode函数</h4><pre><code>这个函数中会对真实dom的子节点按照有没有key属性进行分类。
+接着开始从虚拟dom中依次取出子节点，从真实dom中寻找拥有相同key属性的子节点。
+如果没有找到，那么就从没有key属性的dom子节点中寻找类型相同的节点。
+接着对子节点调用idiff函数，开始子节点的diff。
+当获得diff完成后的dom节点时，就需要将diff后的dom节点插入到当前的父节点中。
+PS:这里的插入过程与react不太相同，可以从代码的注释中了解。
+
+子节点插入完成后，移除掉剩余未使用的节点，此时dom节点的diff完成。
+</code></pre><p>浏览完了元素类型的dom的diff过程，现在要回到idiff中，看一下组件类型的diff过程。在idiff中对于组件类型，调用了buildComponentFromVNode方法，所以现在来看一下他的大致流程：</p>
+<p>PS：组件实例和dom中保存了相互之间的关系，便于从dom快速寻找所在组件实例（偷一张司徒正美大大的图）：</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1g1qfg7f9ytj318k0t0dva.jpg" alt></p>
+<h4 id="buildComponentFromVNode"><a href="#buildComponentFromVNode" class="headerlink" title="buildComponentFromVNode"></a>buildComponentFromVNode</h4><pre><code>函数所做的总结起来只有三句话：
+1、寻找dom所在的组件实例
+2、判断虚拟dom与组件实例的类型是否相同
+3、相同，进入组件实例的更新过程(异步渲染)；不相同，回收组件实例，创建新组件，开始进行组件渲染(同步)。
+2，3步都会调用setComponentProps方法，因为它们都可以看做是组件的diff过程，只不过第三步是和空组件进行diff。
+</code></pre><h3 id="setComponentProps"><a href="#setComponentProps" class="headerlink" title="setComponentProps"></a>setComponentProps</h3><pre><code>通过组件实例的base属性来判断当前是处于渲染还是更新(根据上面的图可以知道，base属性保存了组件所渲染的dom，如果为空说明就不是更新过程)
+如果是渲染过程，在这里就触发组件的componentWillMount钩子函数
+如果是更新过程，在这里就触发组件的componentWillReceiveProps钩子函数。
+接着依据虚拟dom的属性，更新组件实例的对应属性。然后执行renderComponent函数进行组件的正式渲染流程。
+</code></pre><h4 id="renderComponent"><a href="#renderComponent" class="headerlink" title="renderComponent:"></a>renderComponent:</h4><p>首先，先获取组件实例的旧状态和最新的状态，根据base属性判断组件实例是处于更新过程还是渲染过程，<br>nextBase：当组件实例初次渲染时，与组件实例进行diff的真实dom会被存入组件实例的nextBase中，当组件实例被卸载时，它的base的值会被存入nextBase中。<br>initialBase：将要拿来进行diff的真实dom，它来自组件实例的base或nextBase。如果是组件实例的更新过程就是base，如果是挂载过程就是nextBase。<br>initialChildComponent：组件实例触发更新前的子组件。</p>
+<p>如果组件实例base属性不为空，说明组件实例当前已经完成了渲染，那么这次调用renderComponent就是要对组件实例进行更新，接着开始进入更新过程：首先先把更新前的状态赋值给组件实例，因为接下来有可能会调用componentWillMount钩子函数，而在这个函数中调用this.state时需要是旧的值。然后判断组件实例是否可以触发更新，如果可以，那就要开始触发组件的componentWillMount钩子函数，向函数中传入组件的最新值；如果不可以触发更新，那就将skip置为true，他用来表示是否跳过组件的渲染过程，之后接着跳过钩子函数的触发。</p>
+<p>上面的步骤完成后，就要进入组件实例具体的渲染过程：<br>一、先根据skip判断是否要跳过，如果不跳过那么就开始执行：</p>
+<p>首先执行组件实例的render方法，向其中传入了最新的组件状态，render函数返回了组件实例内部的最新的虚拟dom对象rendered，紧接着开始判断组件实例内部最新的虚拟dom对象是否为组件类型：<br>Ⅰ、如果是组件类型，那么就要和更新前的组件实例内部的虚拟dom来比较了：<br>1-1、如果触发更新前组件实例内部的虚拟dom类型和现在最新的虚拟dom类型相同，即都是相同的组件类型，那么就直接开始执行setComponentProps，传入触发更新前的内部的虚拟dom，最新的状态，同步渲染。</p>
+<p>1-2、如果触发更新前组件实例内部的虚拟dom类型和现在不相同，那么就先按照最新的虚拟dom生成对应的内部组件实例，给新的内部组件实例的nextBase属性赋值（ins.nextBase || nextBase），然后让内部组件实例的_parentComponent属性指向父组件，接着开始执行内部组件实例的setComponentProps，但是并不渲染，之后以isChild为true的状态调用renderComponent进行渲染流程。isChild为true表示当前进行渲染的组件是某个高阶组件的内部组件实例。</p>
+<p>执行完1-1或1-2后，将内部组件渲染的真实dom保存在base属性中。</p>
+<p>Ⅱ、如果不是组件类型：<br>cbase = initialBase = isUpdate || nextBase，cbase就是用来diff的真实dom，对于更新过程，cbase就是组件实例当前的base属性；对于挂载过程，cbase就是与组件有关系的还未挂载的真实dom。<br>toUnmount = component_component，表示组件实例的内部组件。<br>如果toUnmount不为空，说明组件实例在触发更新前是一个高阶组件，然而由于现在已经不是高阶组件了，所以组件实例的组件关系要清除，之前的真实dom也不能用了，所以cbase也要清除。<br>如果unmount为空，说明之前不是高阶组件，那么cbase可能有用，所以只需要清除掉它和组件实例的链接就可以了。<br>然后执行diff传入cbase，rendered，context，mountAll根据是否是更新取false/true，如果是更新过程parent参数取值就是当前base的父节点如果不是更新则parent为false，componentRoot这里为true。将diff的结果传给base。</p>
+<p>二、如果skip为true，那就跳过渲染过程。</p>
+<p>具体渲染过程结束，如果diff后的真实dom与之前的dom不相同，更新后的内部的虚拟dom实例与更新前的虚拟dom实例不相同，用base替换initialBase， 如果没有需要卸载的组件实例，说明之前并不是高阶组件，因此只需要将之前的真实dom与组建的关系断开，并回收真实dom就可以了。如果有需要卸载的子组件，说明之前是高阶组件，需要回收子组件。给组件之间设置正确的关系，判断是否将组件加入到触发componentDidMount的队列中，如果不加入队列则判断是否要触发componentDidUpdate。</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#diff函数"><span class="toc-number">1.</span> <span class="toc-text">diff函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#idiff函数"><span class="toc-number">2.</span> <span class="toc-text">idiff函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#innerDiffNode函数"><span class="toc-number">3.</span> <span class="toc-text">innerDiffNode函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#buildComponentFromVNode"><span class="toc-number">4.</span> <span class="toc-text">buildComponentFromVNode</span></a></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#setComponentProps"><span class="toc-number"></span> <span class="toc-text">setComponentProps</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#renderComponent"><span class="toc-number">1.</span> <span class="toc-text">renderComponent:</span></a></li></ol>
+    </li></div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/04/04/从Preact来看diff过程/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&text=从Preact来看diff过程"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&is_video=false&description=从Preact来看diff过程"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=从Preact来看diff过程&body=Check out this article: http://yoursite.com/2019/04/04/从Preact来看diff过程/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&title=从Preact来看diff过程"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/04/04/从Preact来看diff过程/&name=从Preact来看diff过程&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 ___
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+
