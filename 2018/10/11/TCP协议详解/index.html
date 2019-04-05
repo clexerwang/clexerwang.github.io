@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="TCP是面向连接的，提供可靠的全双工通信。面向连接指在进行数据传输前，双方需要通过握手，建立起通信线路（虚拟）。可靠指数据可以有序，完整，无差错，无冗余的由接收方读取。 1-1、MTU和MSSMSS：最大报文段长度MTU：最大传输单元 TCP会将要发送的数据划分成若干块，将每一块都封装成报文段，之后经由IP协议单元将报文段封装成数据包后由链路层封装为数据帧进行发送。每个数据帧的最大长度就是MTU，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCP协议详解">
+<meta property="og:url" content="http://yoursite.com/2018/10/11/TCP协议详解/index.html">
+<meta property="og:site_name" content="Clexer">
+<meta property="og:description" content="TCP是面向连接的，提供可靠的全双工通信。面向连接指在进行数据传输前，双方需要通过握手，建立起通信线路（虚拟）。可靠指数据可以有序，完整，无差错，无冗余的由接收方读取。 1-1、MTU和MSSMSS：最大报文段长度MTU：最大传输单元 TCP会将要发送的数据划分成若干块，将每一块都封装成报文段，之后经由IP协议单元将报文段封装成数据包后由链路层封装为数据帧进行发送。每个数据帧的最大长度就是MTU，">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-05T09:03:54.715Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TCP协议详解">
+<meta name="twitter:description" content="TCP是面向连接的，提供可靠的全双工通信。面向连接指在进行数据传输前，双方需要通过握手，建立起通信线路（虚拟）。可靠指数据可以有序，完整，无差错，无冗余的由接收方读取。 1-1、MTU和MSSMSS：最大报文段长度MTU：最大传输单元 TCP会将要发送的数据划分成若干块，将每一块都封装成报文段，之后经由IP协议单元将报文段封装成数据包后由链路层封装为数据帧进行发送。每个数据帧的最大长度就是MTU，">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>TCP协议详解</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2018/11/06/React-Redux源码阅读/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2018/08/02/ES6：类与继承/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/10/11/TCP协议详解/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/10/11/TCP协议详解/&text=TCP协议详解"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/10/11/TCP协议详解/&is_video=false&description=TCP协议详解"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=TCP协议详解&body=Check out this article: http://yoursite.com/2018/10/11/TCP协议详解/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/10/11/TCP协议详解/&name=TCP协议详解&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1、MTU和MSS"><span class="toc-number">1.</span> <span class="toc-text">1-1、MTU和MSS</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2、TCP报文段结构"><span class="toc-number">1.1.</span> <span class="toc-text">1-2、TCP报文段结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3、三次握手与四次挥手"><span class="toc-number">2.</span> <span class="toc-text">1-3、三次握手与四次挥手</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#三次握手："><span class="toc-number">2.1.</span> <span class="toc-text">三次握手：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么要进行第三次握手？"><span class="toc-number">2.2.</span> <span class="toc-text">为什么要进行第三次握手？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四次挥手："><span class="toc-number">2.3.</span> <span class="toc-text">四次挥手：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么客户端最后还要等待2-MSL？"><span class="toc-number">2.4.</span> <span class="toc-text">为什么客户端最后还要等待2*MSL？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4、TCP的可靠传输"><span class="toc-number">3.</span> <span class="toc-text">1-4、TCP的可靠传输</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1、累积确认"><span class="toc-number">3.1.</span> <span class="toc-text">1-4-1、累积确认</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-2、超时重传"><span class="toc-number">3.2.</span> <span class="toc-text">1-4-2、超时重传</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-4-2-1、过期间隔"><span class="toc-number">3.2.1.</span> <span class="toc-text">1-4-2-1、过期间隔</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#预估往返时间"><span class="toc-number">3.2.1.1.</span> <span class="toc-text">预估往返时间</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#往返时间波动"><span class="toc-number">3.2.1.2.</span> <span class="toc-text">往返时间波动</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#TCP中的修改"><span class="toc-number">3.2.1.3.</span> <span class="toc-text">TCP中的修改</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-3、快速重传"><span class="toc-number">3.3.</span> <span class="toc-text">1-4-3、快速重传</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-4、流量控制"><span class="toc-number">3.4.</span> <span class="toc-text">1-4-4、流量控制</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-4-5、拥塞控制"><span class="toc-number">3.4.1.</span> <span class="toc-text">1-4-5、拥塞控制</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#拥塞控制算法"><span class="toc-number">3.4.1.1.</span> <span class="toc-text">拥塞控制算法</span></a></li></ol></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        TCP协议详解
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Clexer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2018-10-11T09:03:10.000Z" itemprop="datePublished">2018-10-11</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>TCP是面向连接的，提供可靠的全双工通信。<br>面向连接指在进行数据传输前，双方需要通过握手，建立起通信线路（虚拟）。<br>可靠指数据可以有序，完整，无差错，无冗余的由接收方读取。</p>
+<h3 id="1-1、MTU和MSS"><a href="#1-1、MTU和MSS" class="headerlink" title="1-1、MTU和MSS"></a>1-1、MTU和MSS</h3><p>MSS：最大报文段长度<br>MTU：最大传输单元</p>
+<p>TCP会将要发送的数据划分成若干块，将每一块都封装成报文段，之后经由IP协议单元将报文段封装成数据包后由链路层封装为数据帧进行发送。每个数据帧的最大长度就是MTU，为了确保每个数据帧中都能完整的包含上层所封装的报文，就需要满足：</p>
+<pre><code>MTU &gt;= MSS + TCP首部长度 + IP首部长度
+</code></pre><p><code>MSS所指的是报文段中所包含的数据的长度，不是指整个报文段的长度。</code></p>
+<h4 id="1-2、TCP报文段结构"><a href="#1-2、TCP报文段结构" class="headerlink" title="1-2、TCP报文段结构"></a>1-2、TCP报文段结构</h4><pre><code>        源端口号            |             目的端口号
+———————————————————————————————————————————————————————————————
+                           序号
+———————————————————————————————————————————————————————————————
+                          确认号
+———————————————————————————————————————————————————————————————
+首 |保 |U |A |P |R  |S  |F  | 
+部 |留 |R |C |S |S  |Y  |I  |               接收窗口
+长 |位 |G |K |H |T  |N  |N  |
+———————————————————————————————————————————————————————————————
+            校验和          |              紧急数据指针
+———————————————————————————————————————————————————————————————
+                           选项
+———————————————————————————————————————————————————————————————
+                           数据
+
+序号：表示当前所发送数据的首字节在字节流中的位置
+确认号：表示期望收到的数据的起始字节位置
+首部长：表示TCP首部的长度
+ACK：该报文段对一个已接受的报文段表示确认
+RST，SYN，FIN：用于TCP链接的简历和拆除
+URG：表示豹报文段中有紧急数据。
+PSH：表示豹纹短饿的数据要立即提交给上层。
+紧急数据指针：报文段中紧急数据的位置
+（URG，PSH，紧急数据指针并未使用）
+</code></pre><p>解释一下序号和确认号：<br>序号：TCP的每个报文段都会有一个序号，序号的指就是当前报文段的数据的首字节在整个字节流中的位置。<br>确认号：用来表示对接收到的报文段的确认，它的值就是接收到的报文段的数据的最后一个字节在字节流中的位置再加1，表示我已经收到了这个位置之前的数据。</p>
+<blockquote>
+<p>在建立TCP链接时，链接双方的初始序号是随机取值的。</p>
+</blockquote>
+<h3 id="1-3、三次握手与四次挥手"><a href="#1-3、三次握手与四次挥手" class="headerlink" title="1-3、三次握手与四次挥手"></a>1-3、三次握手与四次挥手</h3><h4 id="三次握手："><a href="#三次握手：" class="headerlink" title="三次握手："></a>三次握手：</h4><blockquote>
+<p>1、客户端向服务器发送SYN报文，客户端进入SYN-SENT状态，报文的序号Client_isn是客户端的随机初始序号。</p>
+</blockquote>
+<blockquote>
+<p>2、服务器接收到SYN报文后此时服务器会为TCP链接分配所需的资源（初始化链接变量和缓存），同时向客户端发送SYN-ACK报文，服务端进入SYN-RCVD状态。报文的序号Server_isn是服务器的随机初始序号，确认号ack是Client_isn+1。</p>
+</blockquote>
+<blockquote>
+<p>3、客户端收到SYN—ACK报文段后，向服务器发送ACK报文段，客户端进入ESTABLISHED状态，报文段的SYN置为0。Client_isn为SYN-ACK报文的ack，报文的ack为Server_isn+1。TCP规定，ACK报文段可以携带数据，但是如果不携带数据则不消耗序号。</p>
+</blockquote>
+<blockquote>
+<p>4、当服务器收到客户端的确认后也进入ESTABLISHED状态，此后双方就可以开始通信了。</p>
+</blockquote>
+<h4 id="为什么要进行第三次握手？"><a href="#为什么要进行第三次握手？" class="headerlink" title="为什么要进行第三次握手？"></a>为什么要进行第三次握手？</h4><p>主要防止已经失效的连接请求报文突然又传送到了服务器，从而产生错误。如果使用的是两次握手建立连接，假设有这样一种场景，客户端发送了第一个请求连接并且没有丢失，只是因为在网络结点中滞留的时间太长了，由于TCP的客户端迟迟没有收到确认报文，以为服务器没有收到，此时重新向服务器发送这条报文，此后客户端和服务器经过两次握手完成连接，传输数据，然后关闭连接。此时此前滞留的那一次请求连接，网络通畅了到达了服务器，会让服务器误以为客户端发出了连接请求，两次握手的机制将会让客户端和服务器再次建立连接，这将导致不必要的错误和资源的浪费。</p>
+<p>如果采用的是三次握手，就算是那一次失效的报文传送过来了，服务端接受到了那条失效报文并且回复了确认报文，但是客户端不会再次发出确认。由于服务器收不到确认，就知道客户端并没有请求连接。</p>
+<h4 id="四次挥手："><a href="#四次挥手：" class="headerlink" title="四次挥手："></a>四次挥手：</h4><blockquote>
+<p>1、客户端发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，客户端进入FIN-WAIT-1。</p>
+</blockquote>
+<blockquote>
+<p>2、服务器收到连接释放报文，发出ACK报文。此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。此时服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接。</p>
+</blockquote>
+<blockquote>
+<p>3、客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。</p>
+</blockquote>
+<blockquote>
+<p>4、服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，此时服务器进入LAST-ACK状态，等待客户端确认。</p>
+</blockquote>
+<blockquote>
+<p>5、客户端收到服务器的连接释放报文后，必须发出ACK报文，此时客户端进入TIME-WAIT状态，注意此时TCP连接还没有释放，必须经过2∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。（TCB包含了处理TCP连接所需的数据。包括连接状态（LISTEN，ESTABLISHED，TIME_WAIT），接收窗口，阻塞窗口，顺序号，重发计时器，等等）</p>
+</blockquote>
+<blockquote>
+<p>6、服务器收到了客户端发出的确认后，立即进入CLOSED状态，TCP链接关闭。</p>
+</blockquote>
+<h4 id="为什么客户端最后还要等待2-MSL？"><a href="#为什么客户端最后还要等待2-MSL？" class="headerlink" title="为什么客户端最后还要等待2*MSL？"></a>为什么客户端最后还要等待2*MSL？</h4><p>MSL是报文在网络上存在的最长时间，超过这个时间报文将被丢弃。<br>是为了保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。</p>
+<h3 id="1-4、TCP的可靠传输"><a href="#1-4、TCP的可靠传输" class="headerlink" title="1-4、TCP的可靠传输"></a>1-4、TCP的可靠传输</h3><p>TCP依靠<code>累积确认</code>，<code>超时重传</code>，<code>快速重传</code>来实现可靠的数据传输。</p>
+<h4 id="1-4-1、累积确认"><a href="#1-4-1、累积确认" class="headerlink" title="1-4-1、累积确认"></a>1-4-1、累积确认</h4><p>TCP通过累积确认来识别当前服务器已经获取的报文段。通过报文段的序号与确认序号，可以判断出当前服务器接收的最后一个字节的位置，因而可以确认在该字节之前的所有报文段都已经正确的接收了。</p>
+<h4 id="1-4-2、超时重传"><a href="#1-4-2、超时重传" class="headerlink" title="1-4-2、超时重传"></a>1-4-2、超时重传</h4><p>当发送报文段时就会开启定时器，在过期间隔内如果没有接收到响应报文，那么将会重传上一个报文并重启定时器。<br>对于过期间隔的设置也有一些需要注意。</p>
+<h5 id="1-4-2-1、过期间隔"><a href="#1-4-2-1、过期间隔" class="headerlink" title="1-4-2-1、过期间隔"></a>1-4-2-1、过期间隔</h5><p>过期间隔的设置主要是通过预估往返时间和往返时间的波动情况来计算的。</p>
+<h6 id="预估往返时间"><a href="#预估往返时间" class="headerlink" title="预估往返时间"></a>预估往返时间</h6><p>首先计算某一时刻的某个报文段的往返时间作为<code>SampleRTT</code>(样本往返时间)，当获得新的SampleRTT后会使用下面的公式来计算平均的往返时间：</p>
+<pre><code>EstimatedRTT = (1 - a)*EstimatedRTT + a*SampleRTT
+*a为0.125
+</code></pre><h6 id="往返时间波动"><a href="#往返时间波动" class="headerlink" title="往返时间波动"></a>往返时间波动</h6><p>在计算往返时间时也要考虑波动情况，波动值的计算为：</p>
+<pre><code>DevRTT = (1-b)DevRTT + b * |SampleRTT - EstimatedRTT|
+*b为0.25
+</code></pre><p>所以综合考虑预估时间与波动情况，过期间隔的计算公式为：</p>
+<pre><code>TimeoutInterval = EstimatedRTT + 4 * DevRTT
+</code></pre><p>在初始时TimeoutInterval的值为1，超时后值将会加倍，知道一次接收到豹纹段从而更新了EstimatedRTT后，TimeoutInterval将会使用计算值。</p>
+<h6 id="TCP中的修改"><a href="#TCP中的修改" class="headerlink" title="TCP中的修改"></a>TCP中的修改</h6><p>在TCP协议中对超时重传的机制进行了修改：只有定时器启动时所设置的超时间隙才会使用公式的计算值，当发生超时后，会讲超时间隙不断翻倍，直到收到确认消息或者上层又需要发送的数据时，此时会通过公示计算新的超时间隙并重启计时器。</p>
+<h4 id="1-4-3、快速重传"><a href="#1-4-3、快速重传" class="headerlink" title="1-4-3、快速重传"></a>1-4-3、快速重传</h4><p>超时重传会导致端到端的时延增长，所以可以通过<code>冗余ACK</code>来更快的获知丢包情况。</p>
+<p>如果服务端接收到的报文段不是自己所期望的序号，说明传输中发生了丢包等情况，那么客户端就会再次发送对上一次报文段的确认报文(<code>冗余ACK</code>)，用来通知客户端。</p>
+<p>对于客户端来说，当他连续收到对相同数据的3个冗余ACK，就说明这个数据还没有到达，此时客户端将开始进行<code>快速重传</code>，即在当前计时器到期之前发送所需的报文段，从而减少了等待时间。</p>
+<h4 id="1-4-4、流量控制"><a href="#1-4-4、流量控制" class="headerlink" title="1-4-4、流量控制"></a>1-4-4、流量控制</h4><p>在TCP链接中，链接双方都会设有接收缓存，即：将确认接收的报文段放入接收缓存中，应用程序会从接收缓存中读取数据。但是当发送方发送数据的速度超过接收方读取数据的速度时，就有可能造成接收缓存的溢出，为了防止出现这种情况，TCP提供了<code>流量控制</code>服务。</p>
+<p>以A向B发送数据为例：<br>在接收方B中需要维护几个变量：</p>
+<blockquote>
+<p>rwnd(接收窗口)，它表示接收方的接收缓存的剩余空间。<br>LastByteRead：表示接收方读取的最后一个字节的位置。<br>LastByteRcvd：表示接收方已经确认接受的数据的最后一个字节的位置。</p>
+</blockquote>
+<p>那么为了不让缓存溢出，很自然就要保证：</p>
+<pre><code>LastByteRcvd-LastByteRead &lt;= RcvBuffer(接收缓存大小)
+
+rwnd &gt;= RcvBuffer-(LastByteRcvd-LastByteRead)
+</code></pre><p>在发送方A中也要维护几个变量：</p>
+<blockquote>
+<p>LastByteSent：所发送的最后一个字节的位置。<br>LastByteAcked：已经被确认接收的最后一个字节的位置。</p>
+</blockquote>
+<p>那么对于发送方来说，就要满足：</p>
+<pre><code>rwnd &gt;= LastByteSent - LastByteAcked
+</code></pre><p>接收方通过报文段的接受窗口字段中来告诉发送方自己的rwnd的大小。同时这里会出现一个问题：当接收方在接收到一个报文段后接受缓存满了，此时接收方告诉发送方rwnd为0。在之后的某个时间接收缓存有了空间，但是TCP只有当有报文或者确认要发送时才会发送报文，那么发送方就不能知道现在接收方已经有了缓存空间，这也就阻塞了发送方。<br>为了解决这个问题，TCP规定，当发送方得知接收方rwnd为0后， 会定期发送一个窗口探测数据段, 使接收方把窗口大小告诉发送方。</p>
+<h5 id="1-4-5、拥塞控制"><a href="#1-4-5、拥塞控制" class="headerlink" title="1-4-5、拥塞控制"></a>1-4-5、拥塞控制</h5><p>TCP通过感知网络的拥塞程度，来动态的调节自己的发送速率。</p>
+<p>在TCP的发送方中会有一个cwnd(拥塞窗口),TCP中规定：<code>发送方未被确认的字节数不能超过拥塞窗口和接收窗口的最小值</code>。那么通过调整cwnd的值，就可以控制发送方的发送速率。</p>
+<p><b>拥塞检测</b>：当出现了超时或冗余ACK后，就会认为网络出现了阻塞。</p>
+<h6 id="拥塞控制算法"><a href="#拥塞控制算法" class="headerlink" title="拥塞控制算法"></a>拥塞控制算法</h6><p>####### 慢启动<br>发送方以cwnd的大小来发送数据，在链接开始发送数据时，会将cwnd设置为一个MSS，每当接收到一个确认报文段就会将cwnd的值增加一个MSS。因此慢启动在开始时速率较慢，但之后会以指数增长。</p>
+<p>当慢启动出现超时时，会将cwnd的值设为一个MSS后重新开始慢启动，并将<code>慢启动阈值</code>设为cwnd的一半。</p>
+<p>当慢启动接收到三个冗余ACK时，TCP进行快速重传，并进入到快速恢复状态中。</p>
+<p>当在慢启动中cwnd的值到达慢启动阈值时，结束慢启动并进入拥塞避免模式。</p>
+<p>####### 拥塞避免<br>拥塞避免采用更保守的方式来增加cwnd的大小，即每经过一个RTT，就将cwnd的值增大一个MSS。</p>
+<p>当出现超时时，将cwnd设为1个MSS，并将慢启动阈值设为cwnd的一半，重新进入慢启动状态。</p>
+<p>当接收到三个冗余ACK时说明发生丢包，将cwnd减半，将慢启动阈值设置为cwnd的值。进入到快速恢复状态。</p>
+<p>####### 快速恢复<br>将cwnd设置为慢启动阈值+冗余ACK数量*MSS，开始重传指定的报文段。<br>之后如果再次收到冗余ACK，就将cwnd+1。<br>如果收到新的ACK，那么将cwnd设为慢启动阈值，进入拥塞避免状态。</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1、MTU和MSS"><span class="toc-number">1.</span> <span class="toc-text">1-1、MTU和MSS</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2、TCP报文段结构"><span class="toc-number">1.1.</span> <span class="toc-text">1-2、TCP报文段结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3、三次握手与四次挥手"><span class="toc-number">2.</span> <span class="toc-text">1-3、三次握手与四次挥手</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#三次握手："><span class="toc-number">2.1.</span> <span class="toc-text">三次握手：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么要进行第三次握手？"><span class="toc-number">2.2.</span> <span class="toc-text">为什么要进行第三次握手？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四次挥手："><span class="toc-number">2.3.</span> <span class="toc-text">四次挥手：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么客户端最后还要等待2-MSL？"><span class="toc-number">2.4.</span> <span class="toc-text">为什么客户端最后还要等待2*MSL？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4、TCP的可靠传输"><span class="toc-number">3.</span> <span class="toc-text">1-4、TCP的可靠传输</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1、累积确认"><span class="toc-number">3.1.</span> <span class="toc-text">1-4-1、累积确认</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-2、超时重传"><span class="toc-number">3.2.</span> <span class="toc-text">1-4-2、超时重传</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-4-2-1、过期间隔"><span class="toc-number">3.2.1.</span> <span class="toc-text">1-4-2-1、过期间隔</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#预估往返时间"><span class="toc-number">3.2.1.1.</span> <span class="toc-text">预估往返时间</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#往返时间波动"><span class="toc-number">3.2.1.2.</span> <span class="toc-text">往返时间波动</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#TCP中的修改"><span class="toc-number">3.2.1.3.</span> <span class="toc-text">TCP中的修改</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-3、快速重传"><span class="toc-number">3.3.</span> <span class="toc-text">1-4-3、快速重传</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-4、流量控制"><span class="toc-number">3.4.</span> <span class="toc-text">1-4-4、流量控制</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-4-5、拥塞控制"><span class="toc-number">3.4.1.</span> <span class="toc-text">1-4-5、拥塞控制</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#拥塞控制算法"><span class="toc-number">3.4.1.1.</span> <span class="toc-text">拥塞控制算法</span></a></li></ol></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/10/11/TCP协议详解/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/10/11/TCP协议详解/&text=TCP协议详解"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/10/11/TCP协议详解/&is_video=false&description=TCP协议详解"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=TCP协议详解&body=Check out this article: http://yoursite.com/2018/10/11/TCP协议详解/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/10/11/TCP协议详解/&title=TCP协议详解"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/10/11/TCP协议详解/&name=TCP协议详解&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 ___
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+

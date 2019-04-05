@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Redux中一共提供了5个方法，分别是：createStore，combineReducers，bindActionCreators，applyMiddleware和compose。接下来就分别看一下这几个函数的作用和实现。 createStore:createStore开始对传入的参数做了判断： //如果传入的初始state和enhancer是函数或者一次传入了多个enhancer，就报错 if">
+<meta name="keywords" content="React全家桶">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redux源码阅读">
+<meta property="og:url" content="http://yoursite.com/2019/01/02/Redux源码阅读/index.html">
+<meta property="og:site_name" content="Clexer">
+<meta property="og:description" content="Redux中一共提供了5个方法，分别是：createStore，combineReducers，bindActionCreators，applyMiddleware和compose。接下来就分别看一下这几个函数的作用和实现。 createStore:createStore开始对传入的参数做了判断： //如果传入的初始state和enhancer是函数或者一次传入了多个enhancer，就报错 if">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-05T08:59:58.816Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redux源码阅读">
+<meta name="twitter:description" content="Redux中一共提供了5个方法，分别是：createStore，combineReducers，bindActionCreators，applyMiddleware和compose。接下来就分别看一下这几个函数的作用和实现。 createStore:createStore开始对传入的参数做了判断： //如果传入的初始state和enhancer是函数或者一次传入了多个enhancer，就报错 if">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Redux源码阅读</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2019/01/15/History库源码学习/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2018/12/12/JavaScript的模块化/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/01/02/Redux源码阅读/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/01/02/Redux源码阅读/&text=Redux源码阅读"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/01/02/Redux源码阅读/&is_video=false&description=Redux源码阅读"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Redux源码阅读&body=Check out this article: http://yoursite.com/2019/01/02/Redux源码阅读/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/01/02/Redux源码阅读/&name=Redux源码阅读&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#createStore"><span class="toc-number">1.</span> <span class="toc-text">createStore:</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#getState"><span class="toc-number">1.1.</span> <span class="toc-text">getState</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#subscribe"><span class="toc-number">1.2.</span> <span class="toc-text">subscribe</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#dispatch"><span class="toc-number">1.3.</span> <span class="toc-text">dispatch</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#replaceReducer"><span class="toc-number">1.4.</span> <span class="toc-text">replaceReducer</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#combineReducers"><span class="toc-number">2.</span> <span class="toc-text">combineReducers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bindActionCreators"><span class="toc-number">3.</span> <span class="toc-text">bindActionCreators</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#applyMiddleWare"><span class="toc-number">4.</span> <span class="toc-text">applyMiddleWare</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Redux源码阅读
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Clexer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2019-01-02T08:58:36.000Z" itemprop="datePublished">2019-01-02</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/React全家桶/">React全家桶</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Redux中一共提供了5个方法，分别是：<br><code>createStore</code>，<code>combineReducers</code>，<code>bindActionCreators</code>，<code>applyMiddleware</code>和<code>compose</code>。<br>接下来就分别看一下这几个函数的作用和实现。</p>
+<h3 id="createStore"><a href="#createStore" class="headerlink" title="createStore:"></a>createStore:</h3><p>createStore开始对传入的参数做了判断：</p>
+<pre><code>//如果传入的初始state和enhancer是函数或者一次传入了多个enhancer，就报错
+if (
+    (typeof preloadedState === &#39;function&#39; &amp;&amp; typeof enhancer === &#39;function&#39;) ||
+    (typeof enhancer === &#39;function&#39; &amp;&amp; typeof arguments[3] === &#39;function&#39;)
+  ) {
+    throw new Error(&#39;&#39;)
+  }
+  //如果只传入了两个参数，且第二个参数是函数类型，那就将第二个参数当作enhancer
+  if (typeof preloadedState === &#39;function&#39; &amp;&amp; typeof enhancer === &#39;undefined&#39;) {
+    enhancer = preloadedState
+    preloadedState = undefined
+  }
+
+  //如果传入了enhancer,就直接执行enhancer
+  //这里的enhancer是applyMiddleware的返回值，用来将中间件与createStore绑定起来
+  if (typeof enhancer !== &#39;undefined&#39;) {
+    //如果enhancer不是函数类型，报错
+    if (typeof enhancer !== &#39;function&#39;) {
+      throw new Error(&#39;Expected the enhancer to be a function.&#39;)
+    }
+    //如果是函数类型，执行enhancer并返回
+    return enhancer(createStore)(reducer, preloadedState)
+}
+
+  //如果reducer不是函数，报错
+  if (typeof reducer !== &#39;function&#39;) {
+    throw new Error(&#39;Expected the reducer to be a function.&#39;)
+}
+</code></pre><p>然后对store的状态进行了初始化：</p>
+<pre><code>let currentReducer = reducer
+// 传入的初始state
+let currentState = preloadedState
+// 监听函数队列
+let currentListeners = []
+let nextListeners = currentListeners
+// 表示当前是否正在执行dispatch    
+let isDispatching = false
+// 执行dispatch，获得reducer的初始返回值构建初始状态
+dispatch({ type: ActionTypes.INIT });
+return {
+    dispatch,
+    subscribe,
+    getState,
+    replaceReducer
+}
+</code></pre><p>现在看一下声明的几个方法：</p>
+<h4 id="getState"><a href="#getState" class="headerlink" title="getState"></a>getState</h4><pre><code>function getState() {
+    if (isDispatching) {throw new Error(&#39;&#39;)}
+    // 返回state
+    return currentState
+}
+</code></pre><h4 id="subscribe"><a href="#subscribe" class="headerlink" title="subscribe"></a>subscribe</h4><p>subscribe负责向listeners队列中注册监听函数，当state发生变化时就会依次通知监听队列中的函数。subscribe返回一个取消函数，可以注销监听队列中的函数。</p>
+<pre><code>//表示当前listener已经加入了监听队列
+let isSubscribed = true 
+
+//先备份
+ensureCanMutateNextListeners()
+//再更新
+nextListeners.push(listener)
+
+//返回取消监听的函数
+return function unsubscribe() {
+    if (!isSubscribed) {
+        return
+    }
+      if (isDispatching) {throw new Error(&#39;&#39;)}
+
+      isSubscribed = false
+
+      ensureCanMutateNextListeners()
+      const index = nextListeners.indexOf(listener)
+      nextListeners.splice(index, 1)
+}
+</code></pre><p>这里设置了nextListeners和currentListeners两个队列,nextListeners保存了对队列的修改。当执行dispatch时，会将修改同步至currentListeners然后再依次进行通知。</p>
+<h4 id="dispatch"><a href="#dispatch" class="headerlink" title="dispatch"></a>dispatch</h4><p>dispatch所做的就是将当前状态和获取的action传入reducer中，计算出最新的状态。然后依次通知监听函数。</p>
+<pre><code>//如果当前正在计算状态，就退出
+if (isDispatching) {
+  throw new Error(&#39;Reducers may not dispatch actions.&#39;)
+}
+// isDispatching置为true
+try {
+  isDispatching = true
+  //计算最新的状态
+  currentState = currentReducer(currentState, action)
+} finally {
+  isDispatching = false
+}
+
+// 获取最新的监听函数队列，并依次执行
+const listeners = (currentListeners = nextListeners)
+for (let i = 0; i &lt; listeners.length; i++) {
+  const listener = listeners[i]
+  listener()
+}
+// dispatch默认返回action
+return action
+</code></pre><h4 id="replaceReducer"><a href="#replaceReducer" class="headerlink" title="replaceReducer"></a>replaceReducer</h4><p>替换reducer，在替换完reducer后，会自动执行一次dispatch传入<code>replace</code>类型的action。用来获取新的初始状态。</p>
+<pre><code>if (typeof nextReducer !== &#39;function&#39;) {
+        throw new Error(&#39;&#39;)
+    }
+
+currentReducer = nextReducer
+dispatch({ type: ActionTypes.REPLACE })
+</code></pre><p>以上就是createStore函数的过程，接下来看一下<code>combineReducers</code>函数。</p>
+<h3 id="combineReducers"><a href="#combineReducers" class="headerlink" title="combineReducers"></a>combineReducers</h3><pre><code>//取出reducers中所有的键
+const reducerKeys = Object.keys(reducers)
+const finalReducers = {}
+
+//依次将每个键的值保存到finalReducers中，这里用来过滤掉非函数类型的reducer
+for (let i = 0; i &lt; reducerKeys.length; i++) {
+    const key = reducerKeys[i]
+
+    if (process.env.NODE_ENV !== &#39;production&#39;) {
+        if (typeof reducers[key] === &#39;undefined&#39;) {
+            warning(`No reducer provided for key &quot;${key}&quot;`)
+        }
+    }
+
+    if (typeof reducers[key] === &#39;function&#39;) {
+        finalReducers[key] = reducers[key]
+    }
+}
+//再从finalReducers中取出所有键
+const finalReducerKeys = Object.keys(finalReducers)
+    let unexpectedKeyCache
+    if (process.env.NODE_ENV !== &#39;production&#39;) {
+        unexpectedKeyCache = {}
+    }
+let shapeAssertionError
+try {
+    //检测每个reducer是否都有默认返回值
+    assertReducerShape(finalReducers)
+} catch (e) {
+    shapeAssertionError = e
+}
+//返回一个代替reducer的函数
+return combination;
+</code></pre><p>上面的过程很简单，会发现其中有一个变量<code>unexpectedKeyCache</code>，它是用来保存state中所有不会被处理的属性的。什么意思呢？<br>当我们在执行<code>createStor</code>时，会传入一个初始状态<code>preState</code>。如果同时我们也使用了<code>combineReducers</code>，那么在执行<code>combineReducers</code>时我们会传入一个对象先称为<code>combineState</code>，类似于这样：</p>
+<pre><code>{
+    attr1:reducer1,
+    attr2:reducer2
+}
+</code></pre><p>在<code>combineReducers</code>中就会将属性与对应的reducer进行绑定，每个属性的改变都是由对应的reducer进行处理。所以如果一个属性出现在了<code>preState</code>中却没有出现在<code>combineState</code>中，就说明这个属性没有对应的reducer，那么他就不会被改变，那么这个属性就会被存储在<code>unexpectedKeyCache</code>中。</p>
+<p>接着看代码，combineReducers会返回一个函数，他将作为reducer被传入到createStore中。<br>现在看一下这个函数：</p>
+<pre><code>function combintion(){
+
+//判断前后状态是否改变
+let hasChanged = false
+const nextState = {}
+
+//当传入了state和action时，会按照state中每个属性对应的reducer进行更新，通过比较属性值前后是否相等，来判断是否发生了变化
+for (let i = 0; i &lt; finalReducerKeys.length; i++) {
+    //这里是按照按照combineReducers的参数的键从state中取值，然后传入对应的reducer中进行更新
+    const key = finalReducerKeys[i]   //从combineReducers的参数中取键
+    const reducer = finalReducers[key]  //取对应的reducer
+    const previousStateForKey = state[key]  //从state中取值
+
+    const nextStateForKey = reducer(previousStateForKey, action)  //执行reducer
+
+    if (typeof nextStateForKey === &#39;undefined&#39;) {
+        const errorMessage = getUndefinedStateErrorMessage(key, action)
+        throw new Error(errorMessage)
+    }
+
+    nextState[key] = nextStateForKey
+    hasChanged = hasChanged || nextStateForKey !== previousStateForKey
+    }
+    return hasChanged ? nextState : state
+}
+</code></pre><p>说一下系统发送action的地方：<br>    在执行createStore时，会发送一个type:ACTION_INIT的action来获取state的初始值。<br>    在执行combeReducers时，会发送两个action：<br>    <code>type:ACTION_INIT</code>的action来判断每个reducer是否有默认的返回值，<code>type:ACTION_RANDOM</code>是一个随机的字符串，用来防止某些reducer对<code>ACTION_INIT</code>类型的action进行了处理。</p>
+<h3 id="bindActionCreators"><a href="#bindActionCreators" class="headerlink" title="bindActionCreators"></a>bindActionCreators</h3><p><code>bindActionCreators</code>就是将actionCreator和dispatch函数绑定了起来，类似于这样：</p>
+<pre><code>function bindActionCreators(actionCreator,dispatch){
+    return function(){
+        return dispatch(actionCreator.apply(this,arguments))
+    }
+}
+</code></pre><p>接下来就是关于中间件的函数了。</p>
+<h3 id="applyMiddleWare"><a href="#applyMiddleWare" class="headerlink" title="applyMiddleWare"></a>applyMiddleWare</h3><p>一个中间件的标准格式为：</p>
+<pre><code>function doNothing({dispatch,getState}){
+    return function state_1(next){
+        return function state_2(action){
+            // ··· 中间件的主逻辑···//
+
+            //执行下一个中间件
+            next(action);
+        }
+    }
+}
+</code></pre><p>中间件就像是一个管道一样，当调用dispatch发送action时，action就会从由中间件构成的管道中通过，最终被发送到reducer中。这也就要求了中间件之间必须要连贯起来才能实现action在中间件中的流动。</p>
+<p>从中间件的格式来看，外层的几个函数主要用来接收参数，主逻辑都在最内层。</p>
+<p>在applyMiddleware中，需要向中间件中传递所需的参数，并把中间件最内层的主逻辑串联起来。</p>
+<p>现在看一下applyMiddleware的结构：</p>
+<pre><code>function applyMiddleware(...middlewares){
+    return function enhancer(createStore){
+        return function enhancedCreateStore(...args){
+
+        }
+    }
+}
+</code></pre><p>applyMiddleware接收中间件，返回enhancer函数。这个enhancer就是执行createStore时的第三个参数。enhancer接收createStore函数，并返回一个加强后的createStore函数。<br>现在看一下enhancedCreateStore的内部实现:</p>
+<pre><code>// 先使用createStore生成store对象
+const store = createStore(...args);
+// 将dispatch变成一个不可用的函数
+let dispatch = () =&gt;{
+    throw new Error()
+};
+// 中间件所需参数
+const middlewareAPI = {
+    getState:store.getState,
+    dispatch:function(...args){return dispatch(...args)}
+};
+
+const chain = middlewares.map(function(middleware){
+    return middleware(middlewareAPI)
+});
+
+//让中间件的主逻辑前后串联起来
+dispatch = compose(...chain)(store.dispatch);
+
+//applyMiddleware最后是返回一个store对象，它的dispatch方法被改写为一个顺序执行中间件的函数，并最终调用原来的dispatch
+return {
+    ...store,
+    dispatch
+}
+</code></pre><p>在加强后的createStore中，将dispatch方法与串联的中间件绑定了起来，这样当执行dispatch时，action就会先通过中间件，最终再执行store对象的dispatch方法将action发送到reducer中。</p>
+<p>看一下具体的过程：<br>首先依次执行执行中间件，向其中传入参数：dispatch，getState。此时中间返回函数state_1。<br>接着执行compose(…chain),这一步的作用是将state_1嵌套起来，最终的结果类似于这样：</p>
+<pre><code>function (next){
+    return middle1(middle2(middle3(next)))
+}
+</code></pre><p>此时的中间件需要接受next参数。接着就继续这个函数，并传入store.dispatch作为next。这里要注意，在最内层，也就是最后一个中间件，他所接收的是next是store.dispatch方法，而其他的中间件接受的next参数是上一个中间件的state_2函数，也就是上一个中间件的主逻辑。<br>最终的形式类似于这样：</p>
+<pre><code>function middle1(action){
+    // middle1主逻辑 //
+
+    middles2(action);
+
+}
+function middle2(action){
+     // middle2主逻辑 //
+
+
+     middle3(action)
+
+}
+</code></pre><p>这样中间件的主逻辑就嵌套了起来，参数next就是下一个中间件的主逻辑，直到最后一个中间件，他的next就是store.dispatch方法，可以看到任何中间件都可以中断action的流通过程。</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#createStore"><span class="toc-number">1.</span> <span class="toc-text">createStore:</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#getState"><span class="toc-number">1.1.</span> <span class="toc-text">getState</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#subscribe"><span class="toc-number">1.2.</span> <span class="toc-text">subscribe</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#dispatch"><span class="toc-number">1.3.</span> <span class="toc-text">dispatch</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#replaceReducer"><span class="toc-number">1.4.</span> <span class="toc-text">replaceReducer</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#combineReducers"><span class="toc-number">2.</span> <span class="toc-text">combineReducers</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bindActionCreators"><span class="toc-number">3.</span> <span class="toc-text">bindActionCreators</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#applyMiddleWare"><span class="toc-number">4.</span> <span class="toc-text">applyMiddleWare</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/01/02/Redux源码阅读/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/01/02/Redux源码阅读/&text=Redux源码阅读"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/01/02/Redux源码阅读/&is_video=false&description=Redux源码阅读"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Redux源码阅读&body=Check out this article: http://yoursite.com/2019/01/02/Redux源码阅读/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/01/02/Redux源码阅读/&title=Redux源码阅读"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/01/02/Redux源码阅读/&name=Redux源码阅读&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 ___
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+

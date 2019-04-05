@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结： 1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rej">
+<meta name="keywords" content="Promise">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Promise的实现">
+<meta property="og:url" content="http://yoursite.com/2018/11/26/Promise的实现/index.html">
+<meta property="og:site_name" content="Clexer">
+<meta property="og:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结： 1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rej">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-05T08:28:28.794Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Promise的实现">
+<meta name="twitter:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结： 1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rej">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Promise的实现</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2018/11/27/Javascript-对象/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2018/11/16/浏览器渲染过程/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/11/26/Promise的实现/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/11/26/Promise的实现/&text=Promise的实现"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/11/26/Promise的实现/&is_video=false&description=Promise的实现"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Promise的实现&body=Check out this article: http://yoursite.com/2018/11/26/Promise的实现/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/11/26/Promise的实现/&name=Promise的实现&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#Promise-A-规范"><span class="toc-number">1.</span> <span class="toc-text">Promise/A+规范</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#规范总结："><span class="toc-number">1.1.</span> <span class="toc-text">规范总结：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Promise的实现"><span class="toc-number">2.</span> <span class="toc-text">Promise的实现</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Promise的实现
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Clexer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2018-11-26T08:41:19.000Z" itemprop="datePublished">2018-11-26</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Promise/">Promise</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h4 id="Promise-A-规范"><a href="#Promise-A-规范" class="headerlink" title="Promise/A+规范"></a>Promise/A+规范</h4><p><a href="http://www.ituring.com.cn/article/66566" target="_blank" rel="noopener">http://www.ituring.com.cn/article/66566</a></p>
+<h5 id="规范总结："><a href="#规范总结：" class="headerlink" title="规范总结："></a>规范总结：</h5><pre>
+1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。
+
+2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rejected时会调用onRejected函数，且会传入promise的错误原因。
+注意：终值与错误原因都是不可变值，即前后需要满足‘===’；
+
+3、关于promise2 = promise1.then(onFulfilled, onRejected); 
+      promise3 = promise2.then(onFulfilled, onRejected);
+<pre>
+3-1、不管promise1执行了onFulfilled还是onRejected，promise2的状态都会是fulfilled，除非promise1报错则promise2状态会变为rejected并执行onRejected。
+
+3-2、不管在onFulfilled还是在onRejected中报错，都不会影响promise1的状态，只会影响promise2的状态；
+
+3-3、如果 onFulfilled 不是函数且 promise1 成功执行， promise2 状态为fulfilled并返回相同的值
+
+3-4、如果 onRejected 不是函数且 promise1 拒绝执行， promise2 状态为rejected并返回相同的据因
+
+对于返回值x：
+3-5、x是promise对象或者thenable对象：
+如果x的状态为pending，则promise2需要等x先执行，直到x的状态发生改变，
+
+如果x的状态为fulfilled，那么promise2的状态也为fulfilled，且将x的值传入promise2的onFulfilled函数作为参数。
+
+如果x的状态为rejected，那么promise2的状态也为rejected，且将错误信息传入promise2的onRejected函数作为参数。
+
+3-6、x是一个普通值，则以 x 为参数执行 promise2
+</pre>
+
+<h4 id="Promise的实现"><a href="#Promise的实现" class="headerlink" title="Promise的实现"></a>Promise的实现</h4><p>首先是构造函数：</p>
+<pre><code>function Promise(exector){
+    this.state = &#39;pending&#39;;
+    this.value = null;
+    this.queue = [];
+
+    if(exector !== NullFunction){
+        safelyResolveThen(this,exector);
+    }
+}
+</code></pre><p>state表示promise对象当前的状态，value为promise的值，queue是一个队列其中保存了pending状态的子promise。由于exector函数需要同步执行，所以在Promise构造函数内部直接执行它。</p>
+<p>这里的<code>safelyResolveThen</code>就是用来执行<code>then</code>函数的，它的作用是保证一个promise的状态只能改变一次。所以看一下这个函数：</p>
+<pre><code>function safelyResolveThen(promise,then){
+    //通过called参数确保每个promise的状态只能改变一次
+    let called = false;
+
+    //执行then函数，使用try-catch捕捉错误
+    try{
+        //执行then函数时传入内置的resolve和reject函数
+        //这两个函数用来改变promise的状态，所以要使用called来确保每个promise中这两个方法只能执行一次
+        then(
+            function resolve(value){
+                if(called) return;
+                called = true;
+                doResolve(promise,value);
+            },
+            function reject(value){
+                if(called) return;
+                called = true;
+                doReject(promise,value)
+            }
+        )    
+    }catch(error){
+        //如果执行then时出错，直接改变promise状态为rejected
+        doReject(promise,error)
+    }
+}
+</code></pre><p>可以看到出现了两个新函数<code>doResolve</code>，<code>doReject</code>。这两个函数是<code>resolve</code>和<code>reject</code>的核心，用来改变<code>promise</code>的状态，现在要详细的讲一下它们的作用：<br>首先，如果then函数的返回值或者<code>resolve</code>，<code>reject</code>的参数是一个<code>thenable</code>对象,类似于这样：</p>
+<pre><code>new Promise(function(resolve){
+    resolve( new Promise(function(){}));
+})
+##或者
+promise1.then(function(){
+    return Promise.resolve();
+})
+</code></pre><p>那么当前promise的状态就取决于这个<code>thenable</code>对象的状态。在<code>Promise/A+</code>规范中规定，对于<code>thenable</code>类型的对象需要执行它们的<code>then</code>方法。</p>
+<p>我认为这么做的原因是：由于各种<code>Promise库</code>的实现方法都不相同，为了能够让不同的<code>Promise库</code>相互兼容(也就是APromise的方法也能够处理BPromise对象)需要有统一的方法去判断这个<code>thenable</code>对象的状态，那么就可以通过执行它的then方法，并向其中传入两个自己的函数，这样通过观察<code>thenable</code>对象执行了哪个方法来判断<code>thenable</code>对象的状态。那么说回来，<code>doResolve</code>和<code>doReject</code>所做的就是上面所说的内容,即执行对象的then方法，通过then方法调用的函数来确定promise的状态。</p>
+<p>现在看一下doResolve的代码：</p>
+<pre><code>function doResolve(promise,value){
+    let then；
+    try{
+        //获取传入值的then方法，即判断他是不是thenable对象
+        then = getThen(value);
+
+        if(then){
+            //如果传入值是thenable对象，那么就执行它的then方法，并将resolve，reject方法作为状态改变时的回调函数传进去，这样通过看它执行的是resolve还是reject来判断这个thenable对象的状态
+            safelyResolveThen(promise,then);
+
+        }else{
+            //如果不是thenable对象，那么直接就可以改变promise的状态了
+            promise.state = &#39;pending&#39;;
+            promise.value = value;
+            // 当promise的状态改变后，就要依次通知它的子promise,并把自己的值传递给它们
+            promise.queue.foerEach((eve)=&gt;{
+                eve.callFulFilled(value)
+            })
+        }
+        return promise;
+    }catch(error){
+        //如果出错，直接把当前promise置为rejected
+        return doRejected(promise,error);
+    }
+}
+
+function doReject(promise,error){
+    promise.state = &#39;rejected&#39;;
+    promise.value = &#39;error&#39;;
+    promise.queue.forEach(function(eve){
+        eve.callRejected(error);
+    })
+    return promise;
+}
+</code></pre><p>接着看另外一个重要的函数：<code>then函数</code>，按照<code>Promise/A+</code>规范，每个then方法都要接收onFulfilled，onRejected函数作为promise状态改变时的回调如果传入的onFulfilled或onRejected不是函数类型，就直接忽略该then函数。then函数要返回一个Promise对象。</p>
+<pre><code>Promise.prototype.then=function(onFulfilled，onRejected){
+    //用来判断对应状态的参数是否是函数类型，如果不是则直接跳过该函数
+    if((this.state === &#39;resolved&#39;&amp;&amp; typeof onFulfilled !== &#39;function&#39;)|| (this.state === &#39;rejected&#39;&amp;&amp; typeof onRejected !== &#39;function&#39;))
+    return this;
+
+    //生成新的promise，并将它作为返回值
+    let newPromise = new Promise(NullFunction);
+    //根据当前promise的状态决定接下来的行动
+
+    //如果当前promise的状态已确定,则将对应的回调函数放入微任务队列中等待执行
+    if(this.state !== &#39;pendind&#39;){
+        let resolve = this.state === &#39;resolved&#39;?onFulfilled:onRejected;
+        unwrap(newPromise,resolver,this.value);
+    }else{
+        //如果当前promise的状态未确定，就把newPromise加入到当前promise的队列中，等当前promise的状态确定会，就会依次通知队列中的子promise
+        this.queue.push(new QueueItem(newPromise,onFulfilled,onRejected));
+    }
+    return newPromise;
+}
+
+Promise.prototype.catch = function (onRejected){
+    return this.then(null,onRejected);
+}
+</code></pre><p>然后看一下<code>unwrap</code>函数，它主要使用来setImmediate库用来添加一个需要异步执行的任务：</p>
+<pre><code>function unwrap(promise,resolver,FatherValue){
+    setImmediate(function(){
+        //开始执行对应的回调函数，传入父promise的value，获得回调函数的返回值
+        try{
+            let returnValue = resolver(FatherValue);
+        }catch(error){
+            //如果执行出错，直接变为rejected状态
+            doRejected(promise);
+        }
+
+        //promise回调函数的返回值不能是promise本身
+        if(promise === returnValue){
+            doReject(promise,new TypeError())
+        }else{
+             //这里就是之前说的判断回调函数的返回值是不是一个thenable对象，如果是thenable对象那么就要执行thenable对象的then函数来确定状态，并且promise的状态需要由这个对象的状态来决定。      
+            doResolve(promise,returnValue);
+        }
+    })  
+}
+</code></pre><p>现在Promise对象的核心逻辑差不多搞定了，还差一些零零散散的东西：</p>
+<pre><code>##QueueItem，队列对象，用来将promise对象保存在队列中，
+function QueueItem(promise,onFUlfilled,onRejected){
+    this.promise = promise;
+    //当父promise的状态确定后根据父promise的状态来确定自己的状态
+    //额，这里的FatherValue不是父promise执行回调函数的返回值，而是父promise的value属性中的值
+    this.callFulfilled = function(FatherValue){
+        doResolve(this.promise,FatherValue);
+    }
+    this.callRejected = function(error){
+        doRejected(this.promise,error);
+    }
+
+    //同时，如果promise也有回调函数，那么就异步的执行回调函数
+    if(isFunction(onFulfilled)){
+        this.callFulfilled = function(){
+            unwrap(this.promise,onFulfilled,FatherValue);
+        }
+    }
+}
+
+##获取对象的then方法
+function getThen(obj){
+    let then = obj &amp;&amp; obj.then;
+    //如果obj存在，且obj是一个对象或函数同时他的then属性也是函数
+    if(obj &amp;&amp; (typeof obj === &#39;object&#39;||typeof obj === &#39;function&#39;) &amp;&amp; typeof then === &#39;function&#39;){
+        return function(){
+            then.apply(obj,arguments);
+        }
+    }
+}
+</code></pre><p>下面就是Promise对象的一些方法：Promise.resolve(),Promise.reject(),Promise.race(),Promise.all()</p>
+<pre><code>##Promise.resolve
+Promise.resolve = function(value){
+    //先判断value是不是一个promise对象，如果是那么就直接返回该对象
+    if(this instanceof value){
+        return this
+    }
+
+    //否则就生成一个Promise对象
+    return doResolve(new Promise(NullFunction),value);
+}
+
+##Promise.reject
+Promise.reject = function(value){
+    let promise = new Promise(NullFunction);
+    return doReject(promise,value);
+}
+
+##Promise.all
+Promise.all方法接收一个数组，其中是若干promise对象，并返回一个promise对象。当数组中所有的promise都完成时，Promise.all返回的promise就会变为fulfilled状态，并且promise的value中就是传入的promise的返回值数组(按照完成的顺序排序)。当其中某个promise被拒绝，则返回的promise也变为被拒绝。
+Promise.all = function(iterator){
+    //如果不是数组，就返回一个拒绝的promise
+    if(!isArray(iterator)){
+        return Promise.reject()
+    }
+
+    //如果传入的数组为空
+    if(!iterator.length){
+        return Promise.resolve([]);
+    }
+
+    //生成需要返回的promise
+    let promise = new this(NullFunction);
+
+}
+</code></pre></pre>
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#Promise-A-规范"><span class="toc-number">1.</span> <span class="toc-text">Promise/A+规范</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#规范总结："><span class="toc-number">1.1.</span> <span class="toc-text">规范总结：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Promise的实现"><span class="toc-number">2.</span> <span class="toc-text">Promise的实现</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/11/26/Promise的实现/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/11/26/Promise的实现/&text=Promise的实现"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/11/26/Promise的实现/&is_video=false&description=Promise的实现"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Promise的实现&body=Check out this article: http://yoursite.com/2018/11/26/Promise的实现/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/11/26/Promise的实现/&title=Promise的实现"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/11/26/Promise的实现/&name=Promise的实现&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 ___
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+

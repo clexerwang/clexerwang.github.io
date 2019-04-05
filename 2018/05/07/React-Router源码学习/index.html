@@ -6,18 +6,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="React-Router的核心是History库，所以在看React-Router源码之前最好先看一下History库，这样才能更好的理解React-Router的工作原理。 ####路由实现在React-Router中路由的实现有三种方式：HashRouter、BrowserRouter、MemeryRouter。 任何改变页面URL的操作都会产生新的历史记录(除了history.replace">
-<meta name="keywords" content="React全家桶；">
+    <meta name="description" content="React-Router的核心是History库，所以在看React-Router源码之前最好先看一下History库，这样才能更好的理解React-Router的工作原理。 路由实现在React-Router中路由的实现有三种方式：HashRouter、BrowserRouter、MemeryRouter。 任何改变页面URL的操作都会产生新的历史记录(除了history.replaceStat">
+<meta name="keywords" content="React全家桶">
 <meta property="og:type" content="article">
 <meta property="og:title" content="React-Router源码学习">
 <meta property="og:url" content="http://yoursite.com/2018/05/07/React-Router源码学习/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="React-Router的核心是History库，所以在看React-Router源码之前最好先看一下History库，这样才能更好的理解React-Router的工作原理。 ####路由实现在React-Router中路由的实现有三种方式：HashRouter、BrowserRouter、MemeryRouter。 任何改变页面URL的操作都会产生新的历史记录(除了history.replace">
+<meta property="og:description" content="React-Router的核心是History库，所以在看React-Router源码之前最好先看一下History库，这样才能更好的理解React-Router的工作原理。 路由实现在React-Router中路由的实现有三种方式：HashRouter、BrowserRouter、MemeryRouter。 任何改变页面URL的操作都会产生新的历史记录(除了history.replaceStat">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-29T08:38:41.278Z">
+<meta property="og:updated_time" content="2019-04-05T08:42:33.567Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React-Router源码学习">
-<meta name="twitter:description" content="React-Router的核心是History库，所以在看React-Router源码之前最好先看一下History库，这样才能更好的理解React-Router的工作原理。 ####路由实现在React-Router中路由的实现有三种方式：HashRouter、BrowserRouter、MemeryRouter。 任何改变页面URL的操作都会产生新的历史记录(除了history.replace">
+<meta name="twitter:description" content="React-Router的核心是History库，所以在看React-Router源码之前最好先看一下History库，这样才能更好的理解React-Router的工作原理。 路由实现在React-Router中路由的实现有三种方式：HashRouter、BrowserRouter、MemeryRouter。 任何改变页面URL的操作都会产生新的历史记录(除了history.replaceStat">
     
     
         
@@ -65,7 +65,7 @@
     <span id="actions">
       <ul>
         
-        <li><a class="icon" href="/2018/07/11/从Preact来看diff过程/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        <li><a class="icon" href="/2018/06/26/JavaScript-继承/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
         <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
@@ -93,7 +93,7 @@
 
     </div>
     <div id="toc">
-      
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#路由实现"><span class="toc-number">1.</span> <span class="toc-text">路由实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HashRouter"><span class="toc-number">2.</span> <span class="toc-text">HashRouter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BrowserRouter"><span class="toc-number">3.</span> <span class="toc-text">BrowserRouter</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -123,7 +123,7 @@
       
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/React全家桶；/">React全家桶；</a>
+        <a class="tag-link" href="/tags/React全家桶/">React全家桶</a>
     </div>
 
 
@@ -133,9 +133,9 @@
 
   <div class="content" itemprop="articleBody">
     <p>React-Router的核心是History库，所以在看React-Router源码之前最好先看一下History库，这样才能更好的理解React-Router的工作原理。</p>
-<p>####路由实现<br>在React-Router中路由的实现有三种方式：<code>HashRouter、BrowserRouter、MemeryRouter</code>。</p>
+<h4 id="路由实现"><a href="#路由实现" class="headerlink" title="路由实现"></a>路由实现</h4><p>在React-Router中路由的实现有三种方式：<code>HashRouter、BrowserRouter、MemeryRouter</code>。</p>
 <p>任何改变页面URL的操作都会产生新的历史记录(除了<code>history.replaceState()，location.replace()</code>,他俩是用来替换历史记录的。此外在历史记录中前进，后退，刷新也不会产生新的历史记录)</p>
-<p>####HashRouter<br>HashRouter是通过改变页面URI中的hash部分来实现路由功能的。<br>首先，先说一下<code>location</code>对象，它保存了当前页面的信息，<code>window.location ==== document.location ==== location</code>，即他们都是同一个对象。</p>
+<h4 id="HashRouter"><a href="#HashRouter" class="headerlink" title="HashRouter"></a>HashRouter</h4><p>HashRouter是通过改变页面URI中的hash部分来实现路由功能的。<br>首先，先说一下<code>location</code>对象，它保存了当前页面的信息，<code>window.location ==== document.location ==== location</code>，即他们都是同一个对象。</p>
 <p>location对象拥有若干个属性，分别表示当前页面URL的不同信息：</p>
 <p>例如：  <a href="http://www.baidu.com:80/home/page_one/title?name=js#partone" target="_blank" rel="noopener">http://www.baidu.com:80/home/page_one/title?name=js#partone</a> 中</p>
 <pre><code>hash        //当前URL中的hash信息，以&#39;#&#39;号开头：#partone
@@ -158,7 +158,7 @@ location.reload(true):强制从服务器重新加载当前页面
 <p>说完了location对象后就可以明白，HashRouter的实现原理就是：由于hash的变化不会导致页面重新加载，所以可以一边通过操作改变页面的hash值，一边通过监听页面hash值的变化来执行相应的操作。</p>
 <p>a标签也可以改变页面的hash值：</p>
 <pre><code>&lt;a href=&#39;#hash&#39;&gt;click&lt;/a&gt;
-</code></pre><p>####BrowserRouter<br>BrowserRouter是通过<code>history</code>对象实现的。</p>
+</code></pre><h4 id="BrowserRouter"><a href="#BrowserRouter" class="headerlink" title="BrowserRouter"></a>BrowserRouter</h4><p>BrowserRouter是通过<code>history</code>对象实现的。</p>
 <pre><code class="history```对象保存了当前页面的所有历史记录。">
     history.length    //历史记录的数量
     history.go()      //可以在历史记录中前后跳转
@@ -569,7 +569,7 @@ hashType：设置hash的类型，有三种：
     </div>
 
     <div id="toc-footer" style="display: none">
-      
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#路由实现"><span class="toc-number">1.</span> <span class="toc-text">路由实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HashRouter"><span class="toc-number">2.</span> <span class="toc-text">HashRouter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BrowserRouter"><span class="toc-number">3.</span> <span class="toc-text">BrowserRouter</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">

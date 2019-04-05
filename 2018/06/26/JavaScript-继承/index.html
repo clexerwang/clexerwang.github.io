@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="首先最基本的继承方式：原型链继承： function SuperType(){     this.name=&amp;#39;supeu&amp;#39;; }  function SubType(){     this.name=&amp;#39;sub&amp;#39;; }  SubType.prototype = new SuperType(); 即将父类的实例作为子类的原型对象，从而使子类可以获取父类的属性与方法。 但">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript:继承">
+<meta property="og:url" content="http://yoursite.com/2018/06/26/JavaScript-继承/index.html">
+<meta property="og:site_name" content="Clexer">
+<meta property="og:description" content="首先最基本的继承方式：原型链继承： function SuperType(){     this.name=&amp;#39;supeu&amp;#39;; }  function SubType(){     this.name=&amp;#39;sub&amp;#39;; }  SubType.prototype = new SuperType(); 即将父类的实例作为子类的原型对象，从而使子类可以获取父类的属性与方法。 但">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2018/06/26/JavaScript-继承/1551751991371.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/26/JavaScript-继承/1543458656112.png">
+<meta property="og:updated_time" content="2019-04-05T08:58:07.167Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript:继承">
+<meta name="twitter:description" content="首先最基本的继承方式：原型链继承： function SuperType(){     this.name=&amp;#39;supeu&amp;#39;; }  function SubType(){     this.name=&amp;#39;sub&amp;#39;; }  SubType.prototype = new SuperType(); 即将父类的实例作为子类的原型对象，从而使子类可以获取父类的属性与方法。 但">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/26/JavaScript-继承/1551751991371.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>JavaScript:继承</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2018/07/11/从Preact来看diff过程/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2018/05/07/React-Router源码学习/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/06/26/JavaScript-继承/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/06/26/JavaScript-继承/&text=JavaScript:继承"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/06/26/JavaScript-继承/&is_video=false&description=JavaScript:继承"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JavaScript:继承&body=Check out this article: http://yoursite.com/2018/06/26/JavaScript-继承/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/06/26/JavaScript-继承/&name=JavaScript:继承&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        JavaScript:继承
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Clexer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2018-06-26T08:51:54.000Z" itemprop="datePublished">2018-06-26</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>首先最基本的继承方式：原型链继承：</p>
+<pre><code>function SuperType(){
+    this.name=&#39;supeu&#39;;
+}
+
+function SubType(){
+    this.name=&#39;sub&#39;;
+}
+
+SubType.prototype = new SuperType();
+</code></pre><p>即将父类的实例作为子类的原型对象，从而使子类可以获取父类的属性与方法。</p>
+<p>但是，当进行<b style="color:red">原型链继承</b>时，由于此时SuperType的实例变成了SubType的原型，则现在所有SubType的实例都共享SuperType的那个实例，就会导致共享那些本不应该共享的属性，同时创建子类实例时，无法向父类构造函数传参。</p>
+<p>为了解决上述的缺点，又出现了另外一种继承方法：‘<b style="color:red">借用构造函数</b>,主要是在子类构造函数中借用父类的构造函数来继承父类的实例属性。<br>它的优点是：1、解决了原型链继承时父类实例属性被子类共享的问题，2、可以在继承时给父类构造函数传递参数。但是缺点也很明显：无法实现属性或方法的共享。<br>e.g.    </p>
+<pre><code>      function SuperType(){
+            this.colors=[1,2,3];
+            }
+      function SubType(){
+            this.name=&quot;a&quot;;    
+    //这个语句要结合P145中所讲的使用new操作符调用构造函数的实际过程来看。当执行new SubType()时，首先创建一个新对象，接着将构造函数的作用域赋值给新对象，由于this指向当前的作用域所以此时this就会指向这个新对象。
+    //接下来开始运行SuperType.call(this);语句。由于this指向新对象，所以这里就相当于把新对象当作了SuperType的作用域，所以SuperType函数内部的this也指向这个新对象，从而在SuperType函数的内部完成对新对象的处理，之后继续在SubType函数中继续处理新对象，最终返回新对象。            
+            SuperType.call(this);   
+            this.age=10;                   
+     }                                       
+      var instance=new SubType();
+      console.log(instance.name);            // a
+      console.log(instance.colors)            //  1,2,3
+</code></pre><p>注意：在借用构造函数继承法中，子类只能继承父类构造函数中的方法和属性，不能继承父类原型对象中的方法和属性。<br>         这种方法并没有改变子类的原型对象，只是把父类构造函数中的方法和属性添加到了子类的构造函数中。</p>
+<p>然后就可以使用<b style="color:red">组合继承：（借用构造函数+原型链）</b>。<br>先使用原型链继承，接着通过借用构造函数的方法，在创建每个子类实例时，把父类的实例属性直接传递给子类的实例，这样还可以屏蔽子类原型对象中从父类中继承而来的同名属性。<br>e.g：</p>
+<pre><code> function SuperType(name){
+     this.name=name;
+     this.colors=[&quot;red&quot;,&quot;blue&quot;];
+ }
+ SuperType.prototype.sayName=function(){
+     alert(this.name);
+ }
+ function SubType(age,name){
+     SuperType.call(this,name);                            //使用借用构造函数的方法继承父类构造函数中的属性。
+     this.age=age;
+ }
+ SubType.prototype=new SuperType();             //使用原型链的方法继承父类构造函数、原型中的方法和属性。（其中父类构造函数中的属性被放入子类的原型中后，会被子类由借用构造函数方法继承的父类构造函数中的属性所屏蔽））
+ SubType.prototype.constructor=SuperType;
+ SubType.prototype.sayAge=function(){
+     alert(this.age);
+ }
+</code></pre><p>总的来说：刚开始对单个构造函数创建实例时发现，原型对象中的属性会被实例共享，所以后来就把不需要共享的属性放在了构造函数中，但是之后利用原型链进行继承时发现还是不行，因为父类的实例在被继承时，就变成了子类型的原型对象，这样父类实例中的不需要共享的属性又跑到了子类型的原型中。然后就又同时使用了借用构造函数的方法，这样每个实例中都会有跟原型中引用类型重名的引用类型，这样可以屏蔽原型中的引用类型，实现之间的相独立。这整个方法就叫做组合继承。</p>
+<p><b style="color:red">原型式继承和寄生组合式继承</b>：<br>原型式继承是借助原型链来创建某个对象的副本。<br>原型式继承返回一个空对象，而这个空对象继承自父类。所以可以通过这个空对象来访问父类的属性。</p>
+<pre><code>//原型式继承的函数:
+function newObject(u){      
+       function F(){};
+       F.prototype=u;
+       return new F();
+       }   
+
+function Super(){
+    this.name = &#39;super&#39;;
+}
+function Sub1(){ }
+function Sub2(){ }
+/******与原型链继承做一个对比******/
+
+//当传入的是父类的实例时：
+//原型式继承：
+Sub1.prototype = newObject(new Super());
+//原型链继承
+Sub2.prototype = new Super();
+
+//打印一下
+console.log(Sub1.prototype); //{}
+console.log(Sub2.prototype); //{name:&#39;super&#39;}
+/*可以看出，
+原型式继承中，子类的原型是一个空对象，它其实是newObject中那个中间类的实例，而中间类继承了父类；
+原型链继承中，子类的原型是父类的实例；
+在传入父类实例的情况下，单独使用这两种继承方式没有很大的差别。
+*/
+
+//在组合继承中是使用借用构造函数和原型链继承的方式，但是这个方式有一个缺点：父类构造函数的重复执行，这就会出现子类实例属性与原型属性的重复的情况。
+//所以寄生组合式继承使用借用构造函数继承父类的实例属性，使用寄生式继承来继承父类的原型
+/*
+这里要多说一句，为什么要用寄生式继承来继承父类的原型呢？
+为什么不直接把父类的原型当作子类的原型，然后修改原型的constructor不就好了吗？
+
+答案其实很简单，如果将父类的原型直接传给子类当作子类的原型，就相当于父类和子类共用了一个原型对象，这样当对父类或子类的原型进行修改时都会对对方的原型对象产生影响。
+而为什么要使用寄生式继承，先来看一下寄生组合式继承中的寄生式继承的代码：
+*/
+
+//这里传入子类和父类的构造函数
+function inheritProto(subType,superType){
+    //在原型式继承中传入父类的原型，返回中间类的实例
+    let prototype = newObject(superType.prototype);
+    //修改原型的constructor
+    prototype.constructor = subType;
+    //将中间类的实例作为子类的原型对象
+    subType.prototype = prototype;
+}
+
+//在组合继承中，使用原型链继承的方式来实现在继承父类的同时也可以防止直接对父类原型对象进行更改（因为子类的原型对象是父类的一个实例，所以在更改子类的原型对象时不会影响到父类的原型对象）。
+//为了更高的效率，可以使用别的方式来获得同样的效果。通过原型式继承获得父类原型对象的副本，将副本作为子类的原型对象，就可以实现同样的效果。
+</code></pre><p><b style="color:red">寄生式继承</b>：</p>
+<pre><code>    function createAnother(u){
+     var clone=newObject(u);
+     clone.sayHi=function(){
+               alert(&quot;Hi&quot;);
+               }
+     return clone;
+     }
+</code></pre><p>寄生式继承的原理：它和原型式继承的关系比较密切，寄生式继承是封装一个函数，这个函数内部先使用原型式继承创建一个实例，然后再增强这个实例之后返回这个实例。</p>
+<p>原型式继承和寄生式继承的区别：原型式继承可以修改它所返回的实例的原型，例如在上面原型式继承的那个例子中，</p>
+<pre><code>         function newObject(u){
+          function F(){};     //这一步可以给实例的构造函数中添加所需的属性                                                                                                        
+          F.prototype=u;
+          F.prototype.newAttribute=&quot;new&quot;;     //这一步可以给实例的原型对象添加所需的方法和属性
+          return new F();
+          }                                                                                                                                                                                                    
+</code></pre><p>寄生式继承不能修改实例的原型对象中的属性，在上面的寄生式继承的例子中，</p>
+<pre><code>         function createAnother(u){
+           var new=newObject(u);     //使用了原型式继承
+           new.newAtttriibute=&quot;new&quot;;     //添加新的实例属性
+           return new；
+           }
+</code></pre><p>###JS中原型链关系图<br><img src="/2018/06/26/JavaScript-继承/./1551751991371.png" alt="Alt text"></p>
+<p>###Function与Object的关系<br>Object构造函数是Function的实例，所以<code>Object.__proto__</code>指向<code>Function.prototype</code></p>
+<p><code>Function.prototype</code>又是Object的实例，所以<code>Function.prototype.__proto__</code>指向Object.prototype</p>
+<p><code>Object.prototype.__proto__</code>指向null</p>
+<p><code>Function.__proto__</code>指向<code>Function.prototype</code>(可以理解为Function构造函数是Function类的实例，所以<code>Function.__proto__</code>指向<code>Function.prototype</code>)</p>
+<p><img src="/2018/06/26/JavaScript-继承/./1543458656112.png" alt="Alt text"></p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/06/26/JavaScript-继承/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/06/26/JavaScript-继承/&text=JavaScript:继承"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/06/26/JavaScript-继承/&is_video=false&description=JavaScript:继承"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JavaScript:继承&body=Check out this article: http://yoursite.com/2018/06/26/JavaScript-继承/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/06/26/JavaScript-继承/&title=JavaScript:继承"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/06/26/JavaScript-继承/&name=JavaScript:继承&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 ___
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+
