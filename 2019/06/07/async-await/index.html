@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 async/await的实现async函数async函数是使用执行器对生成器函数进行了包裹 async func">
+<meta name="keywords" content="async&#x2F;await">
+<meta property="og:type" content="article">
+<meta property="og:title" content="async&#x2F;await">
+<meta property="og:url" content="http://yoursite.com/2019/06/07/async-await/index.html">
+<meta property="og:site_name" content="Clexer">
+<meta property="og:description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 async/await的实现async函数async函数是使用执行器对生成器函数进行了包裹 async func">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-05T09:09:47.494Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="async&#x2F;await">
+<meta name="twitter:description" content="Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是async/await。 在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。 async/await的实现async函数async函数是使用执行器对生成器函数进行了包裹 async func">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>async/await</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2019/12/04/ES6-Generator/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2019/01/15/History库源码学习/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/06/07/async-await/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/06/07/async-await/&text=async/await"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/06/07/async-await/&is_video=false&description=async/await"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=async/await&body=Check out this article: http://yoursite.com/2019/06/07/async-await/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/06/07/async-await/&name=async/await&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#async-await的实现"><span class="toc-number">1.</span> <span class="toc-text">async/await的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#async函数"><span class="toc-number">1.1.</span> <span class="toc-text">async函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内置的执行器"><span class="toc-number">1.2.</span> <span class="toc-text">内置的执行器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对题目的理解："><span class="toc-number">2.</span> <span class="toc-text">对题目的理解：</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        async/await
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Clexer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2019-06-07T08:53:33.000Z" itemprop="datePublished">2019-06-07</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/async-await/">async/await</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Generator可以用来执行异步任务，但是需要编写执行器。在ES7中增加了使用Generator执行异步任务的语法糖，那就是<code>async/await</code>。</p>
+<p>在async/await中内置了执行器，所以可以直接使用而无需编写执行器。其中async/await的语法与Generator的相同。</p>
+<h2 id="async-await的实现"><a href="#async-await的实现" class="headerlink" title="async/await的实现"></a>async/await的实现</h2><h3 id="async函数"><a href="#async函数" class="headerlink" title="async函数"></a>async函数</h3><p>async函数是使用执行器对生成器函数进行了包裹</p>
+<pre><code>async function example(){
+    let content = await readFile(&#39;ex.json&#39;);
+}
+
+就相当于：
+
+function example(){
+    return run(function *(){
+        let content = yield readFile(&#39;ex.json&#39;);
+    })
+}
+</code></pre><h3 id="内置的执行器"><a href="#内置的执行器" class="headerlink" title="内置的执行器"></a>内置的执行器</h3><p>在async/await中内置的执行器返回的是Promise对象。</p>
+<p>执行器实现：</p>
+<pre><code>function runMaster(generator){
+    return new Promise(function(resolve,reject){
+        let iterator = generator();
+
+        function step(next){
+            try{
+                let result = next();
+            }catch(e){
+                return reject(e)
+            }
+
+            if(result.done){
+                return resolve(result.value)    
+            }
+
+            //这里Promise.resolve所生成的Promise对象的状态不一定是fulfilled，
+            //因为生成的Promise的状态是根据传入的next.value来决定的
+            //如果next.value是一个状态为pending的Promise对象，那么Promise.resolve返回的也是pendind状态
+            Promise.resolve(next.value).then(function(value){
+                step(iterator.next.bind(iterator,value))
+            }).catch(function(err){
+                step(iterator.next.bind(iterator,value))   
+            })   
+        }
+
+        step(iterator.next.bind(iterator));
+
+    })
+}
+</code></pre><p>现在整体的看一下执行器做了什么。首先执行器会返回一个Promise对象，而Promise对象的状态由内部函数决定。在内部函数中，主要负责循环执行迭代器的next方法，每执行一次就要判断next的返回值。根据返回值的不同执行不同的流程：</p>
+<pre><code>1、返回值报错，直接执行reject，将Promise对象的状态改为rejected并返回。
+
+2、返回值的value为true，表示生成器内部的逻辑已经执行完成，执行resolve，将Promise对象的状态改为fulfilled并返回。
+
+3、返回值的value为false，说明还需要继续执行next方法，那么就生成一个新的fulfilled状态的Promise对象，并将对next方法的调用作为onfulfilled函数放入then中(这样就会将onfulfilled函数放入微任务队列中)，并退出。
+</code></pre><h2 id="对题目的理解："><a href="#对题目的理解：" class="headerlink" title="对题目的理解："></a>对题目的理解：</h2><pre><code>async function async1() {
+    console.log( &#39;async1 start&#39; )
+    await async2()            
+    console.log( &#39;async1 end&#39; )
+}
+async function async2() {
+    console.log( &#39;async2&#39; );
+    return Promise.resolve();
+    }
+console.log( &#39;script start&#39; )
+setTimeout( function () {
+    console.log( &#39;setTimeout&#39; )
+}, 0 )
+async1();
+new Promise( function ( resolve ) {
+    console.log( &#39;promise1&#39; )
+    resolve();
+} ).then(function () {
+    console.log( &#39;promise2&#39; )
+} ).then(function () {
+    console.log( &#39;promise3&#39; )
+} )
+console.log( &#39;script end&#39; )
+</code></pre><p>重点就是执行器中的这一句：</p>
+<pre><code>Promise.resolve(next.value).then(function(value){
+                step(iterator.next.bind(iterator,value))
+            }).catch(function(err){
+                step(iterator.next.bind(iterator,value))   
+            })   
+</code></pre><p>开始时我一直以为Promise.resolve()一定会返回一个<code>fulfilled</code>状态的Promise对象。但是实际上是如果向Promise.resolve()中传入了一个Promise对象，那么Promise.resolve()不会对该对象做任何处理直接返回该对象。</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#async-await的实现"><span class="toc-number">1.</span> <span class="toc-text">async/await的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#async函数"><span class="toc-number">1.1.</span> <span class="toc-text">async函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内置的执行器"><span class="toc-number">1.2.</span> <span class="toc-text">内置的执行器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对题目的理解："><span class="toc-number">2.</span> <span class="toc-text">对题目的理解：</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/06/07/async-await/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/06/07/async-await/&text=async/await"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/06/07/async-await/&is_video=false&description=async/await"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=async/await&body=Check out this article: http://yoursite.com/2019/06/07/async-await/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/06/07/async-await/&title=async/await"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/06/07/async-await/&name=async/await&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 ___
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="http://github.com/clexerwang">Github</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.2.0/styles/hybrid.min.css"> <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+

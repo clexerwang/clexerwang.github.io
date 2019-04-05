@@ -9,14 +9,14 @@
     <meta name="description" content="React-redux为在react中使用redux提供了便利，它向组件提供了全局的store对象，同时让组件能够方便的发送action，获取状态。 ProviderReact-redux通过react框架的context来向组件提供store对象和storeState值，并且在store上绑定监听函数，在监听函数中用来获取新的storeState值，如果storeState的值发生了变化，就触发">
 <meta name="keywords" content="React全家桶">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redux-Redux源码阅读">
+<meta property="og:title" content="React-Redux源码阅读">
 <meta property="og:url" content="http://yoursite.com/2018/11/06/React-Redux源码阅读/index.html">
 <meta property="og:site_name" content="Clexer">
 <meta property="og:description" content="React-redux为在react中使用redux提供了便利，它向组件提供了全局的store对象，同时让组件能够方便的发送action，获取状态。 ProviderReact-redux通过react框架的context来向组件提供store对象和storeState值，并且在store上绑定监听函数，在监听函数中用来获取新的storeState值，如果storeState的值发生了变化，就触发">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-05T09:02:22.429Z">
+<meta property="og:updated_time" content="2019-04-05T09:08:12.366Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Redux-Redux源码阅读">
+<meta name="twitter:title" content="React-Redux源码阅读">
 <meta name="twitter:description" content="React-redux为在react中使用redux提供了便利，它向组件提供了全局的store对象，同时让组件能够方便的发送action，获取状态。 ProviderReact-redux通过react框架的context来向组件提供store对象和storeState值，并且在store上绑定监听函数，在监听函数中用来获取新的storeState值，如果storeState的值发生了变化，就触发">
     
     
@@ -37,7 +37,7 @@
         
     
     <!-- title -->
-    <title>Redux-Redux源码阅读</title>
+    <title>React-Redux源码阅读</title>
     <!-- styles -->
     <link rel="stylesheet" href="/css/style.css">
     <!-- rss -->
@@ -68,7 +68,7 @@
         <li><a class="icon" href="/2018/11/16/浏览器渲染过程/"><i class="fa fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
-        <li><a class="icon" href="/2018/10/11/TCP协议详解/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        <li><a class="icon" href="/2018/10/13/setState的异步与同步/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
         
         <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
         <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
@@ -82,15 +82,15 @@
     <div id="share" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/11/06/React-Redux源码阅读/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&text=Redux-Redux源码阅读"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&is_video=false&description=Redux-Redux源码阅读"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Redux-Redux源码阅读&body=Check out this article: http://yoursite.com/2018/11/06/React-Redux源码阅读/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&name=Redux-Redux源码阅读&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&text=React-Redux源码阅读"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&is_video=false&description=React-Redux源码阅读"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=React-Redux源码阅读&body=Check out this article: http://yoursite.com/2018/11/06/React-Redux源码阅读/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&name=React-Redux源码阅读&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -107,7 +107,7 @@
   <header>
     
     <h1 class="posttitle" itemprop="name headline">
-        Redux-Redux源码阅读
+        React-Redux源码阅读
     </h1>
 
 
@@ -510,15 +510,15 @@ function handleNewState() {
     <div id="share-footer" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2018/11/06/React-Redux源码阅读/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&text=Redux-Redux源码阅读"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&is_video=false&description=Redux-Redux源码阅读"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Redux-Redux源码阅读&body=Check out this article: http://yoursite.com/2018/11/06/React-Redux源码阅读/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=Redux-Redux源码阅读"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&name=Redux-Redux源码阅读&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&text=React-Redux源码阅读"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&is_video=false&description=React-Redux源码阅读"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=React-Redux源码阅读&body=Check out this article: http://yoursite.com/2018/11/06/React-Redux源码阅读/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&title=React-Redux源码阅读"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2018/11/06/React-Redux源码阅读/&name=React-Redux源码阅读&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
