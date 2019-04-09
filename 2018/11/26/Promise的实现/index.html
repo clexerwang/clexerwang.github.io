@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Clexer">
 <meta property="og:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结： 1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rej">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-05T08:28:28.794Z">
+<meta property="og:updated_time" content="2019-04-09T04:43:12.148Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Promise的实现">
 <meta name="twitter:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结： 1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rej">
@@ -161,7 +161,7 @@
 如果x的状态为rejected，那么promise2的状态也为rejected，且将错误信息传入promise2的onRejected函数作为参数。
 
 3-6、x是一个普通值，则以 x 为参数执行 promise2
-</pre>
+</pre></pre>
 
 <h4 id="Promise的实现"><a href="#Promise的实现" class="headerlink" title="Promise的实现"></a>Promise的实现</h4><p>首先是构造函数：</p>
 <pre><code>function Promise(exector){
@@ -355,7 +355,7 @@ Promise.all = function(iterator){
     let promise = new this(NullFunction);
 
 }
-</code></pre></pre>
+</code></pre>
   </div>
 </article>
 
