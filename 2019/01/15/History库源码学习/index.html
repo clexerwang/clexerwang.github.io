@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Clexer">
 <meta property="og:description" content="在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。  History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。  如果感觉文章太长，可以直接看工作">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-05T08:30:53.263Z">
+<meta property="og:updated_time" content="2019-04-09T04:45:36.201Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="History库源码学习">
 <meta name="twitter:description" content="在BOM中有原生history对象，它包含了当前页面的历史信息，通过这个history对象可以在历史信息中前后跳转，在H5中为histroy又添加了新的历史状态管理功能：pushState和replaceState以及popstate事件。  History库所做的就是包装了原来的history对象，它抹平了浏览器之间的差异，同时也对history进行了增强。  如果感觉文章太长，可以直接看工作">
@@ -321,7 +321,7 @@ function checkDOMListeners(delta) {
 
     }
 }
-</code></pre><p>handlePop所做的就是执行setState或者执行<code>transitionManager.confirmTransitionTo</code>。函数中有一个forceNextPop变量，它的作用在下面再讲。</p>
+</code></pre><p>handlePop所做的就是执行setState或者执行<code>transitionManager.confirmTransitionTo</code>,函数中有一个forceNextPop变量，它的作用在下面再讲。</p>
 <h4 id="setState"><a href="#setState" class="headerlink" title="setState"></a>setState</h4><pre><code>const setState = function(nextState){
     //更新history对象        
     Object.assign(history, nextState);
