@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Clexer">
 <meta property="og:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结： 1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rej">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-09T04:43:12.148Z">
+<meta property="og:updated_time" content="2019-04-15T05:48:11.339Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Promise的实现">
 <meta name="twitter:description" content="Promise/A+规范http://www.ituring.com.cn/article/66566 规范总结： 1、then方法接收两个参数onFulfilled，onRejected。且如果onFulfilled，onRejected不是函数，则会被忽略。  2、当promise变为fulfilled时会调用onFulfilled函数，且会传入promise的终值。当promise变为rej">
@@ -320,7 +320,7 @@ function getThen(obj){
         }
     }
 }
-</code></pre><p>下面就是Promise对象的一些方法：Promise.resolve(),Promise.reject(),Promise.race(),Promise.all()</p>
+</code></pre><p>下面就是Promise对象的一些方法：<code>Promise.resolve()</code>,<code>Promise.reject()</code>,<code>Promise.race()</code>,<code>Promise.all()</code></p>
 <pre><code>##Promise.resolve
 Promise.resolve = function(value){
     //先判断value是不是一个promise对象，如果是那么就直接返回该对象
@@ -338,22 +338,108 @@ Promise.reject = function(value){
     return doReject(promise,value);
 }
 
-##Promise.all
-Promise.all方法接收一个数组，其中是若干promise对象，并返回一个promise对象。当数组中所有的promise都完成时，Promise.all返回的promise就会变为fulfilled状态，并且promise的value中就是传入的promise的返回值数组(按照完成的顺序排序)。当其中某个promise被拒绝，则返回的promise也变为被拒绝。
+
+##Promise.all方法接收一个数组，其中是若干promise对象，并返回一个promise对象。当数组中所有的promise都完成时，Promise.all返回的promise就会变为fulfilled状态，并且promise的value中就是传入的promise的返回值数组(按照完成的顺序排序)。当其中某个promise被拒绝，则返回的promise也变为被拒绝。
+
 Promise.all = function(iterator){
+    let self = this;
     //如果不是数组，就返回一个拒绝的promise
     if(!isArray(iterator)){
         return Promise.reject()
     }
-
     //如果传入的数组为空
     if(!iterator.length){
         return Promise.resolve([]);
     }
-
+    let called = false;
     //生成需要返回的promise
     let promise = new this(NullFunction);
+    //生成保存各个promise返回值的数组
+    let values = [];
 
+    //对传入的每个promise进行处理，绑定完成后的回调函数
+    iterator.forEach(function(eve){
+        self.resolve(eve).then(function(value){
+            values.push(value);
+            //如果此时所有传入的promise状态都已确定，则改变当前promise的状态
+            if(values.length === iterator.length &amp;&amp; !called){
+                called = true;
+                promise.state = &#39;fulfilled&#39;;
+                promise.value = values;
+                promise.queue.forEach(function(e){
+                    e.callFulfilled(values);
+                })
+            }
+        },function(err){
+            if(!called){
+            called = true;
+            promise.state = &#39;rejected&#39;;
+            promise.value = values;
+            promise.queue.forEach(function(e){
+                e.callRejected(values);
+            })
+        }
+    })
+})
+    return promise;
+}
+
+
+Promise.race = function(iterator){
+    if(!iterator[Symbol.iterator]){
+        return new TypeError(&#39; &#39;);
+    }
+    if(!iterator.length){
+        return Promise.resolve([]);
+    }
+
+    let self = this;
+    let called = false
+    let promise = new self(NULLFUNC);
+
+    iterator.forEach(funcion(eve){
+        self.resolve(eve).then(function(value){
+            if(!called){
+                called = true;
+                promise.state = &#39;fulfilled&#39;;
+                promise.value = value;
+                promise.queue.forEach(function(e){
+                    e.callFUlfilled(value)
+                })
+            }
+        },function(error){
+            if(!called){
+                called = true;
+                promise.state = &#39;rejected&#39;;
+                promise.value = value;
+                promise.queue.forEach(function(e){
+                    e.callRejected(value)
+                })
+            }
+        })
+    })
+    return promise;
+}
+</code></pre><p>最后就是保存在promise队列中的队列对象：</p>
+<pre><code>function QueueItem(promise,resolve,reject){
+    this.promise = promise;
+    this.callFulfilled = function(value){
+        doResolve(this.promise,value);
+    };
+    this.callRejected = function(error){
+        doReject(this.promise,error);
+    }
+
+    if(typeof resolve === &#39;function&#39;){
+        this.callFulfilled = function(value){
+            unwrap(this.promise,resolve,value)
+        }
+    }
+    if(typeof reject === &#39;function&#39;){
+        this.callRejected = function(value){
+            unwrap(this.promise,reject,value)
+        }
+    }
 }
 </code></pre>
   </div>
