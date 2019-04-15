@@ -6,17 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="目前流行的js模块化规范有CommonJS、AMD、CMD以及ES6的模块系统 CommonJS—NodeJS根据CommonJS规范，一个单独的文件就是一个模块。每一个模块都是一个单独的作用域，也就是说，在该模块内部定义的变量，无法被其他模块读取，除非定义为global对象的属性。 ```Node.js```有四个重要的环境变量为模块化的实现提供支持：```module```、```export">
+    <meta name="description" content="目前流行的js模块化规范有CommonJS、AMD、CMD以及ES6的模块系统 AMD—RequireJS ```require.config()```用来指定引用路径，```define()```用来定义模块，```require()```用来加载模块。 使用时要先在网页中引入```require.js```,设置```data-main```属性： ```&amp;lt;script src=&amp;quo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JavaScript的模块化">
 <meta property="og:url" content="http://yoursite.com/2018/12/12/JavaScript的模块化/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="目前流行的js模块化规范有CommonJS、AMD、CMD以及ES6的模块系统 CommonJS—NodeJS根据CommonJS规范，一个单独的文件就是一个模块。每一个模块都是一个单独的作用域，也就是说，在该模块内部定义的变量，无法被其他模块读取，除非定义为global对象的属性。 ```Node.js```有四个重要的环境变量为模块化的实现提供支持：```module```、```export">
+<meta property="og:description" content="目前流行的js模块化规范有CommonJS、AMD、CMD以及ES6的模块系统 AMD—RequireJS ```require.config()```用来指定引用路径，```define()```用来定义模块，```require()```用来加载模块。 使用时要先在网页中引入```require.js```,设置```data-main```属性： ```&amp;lt;script src=&amp;quo">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-05T08:29:39.659Z">
+<meta property="og:updated_time" content="2019-04-15T06:31:33.801Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JavaScript的模块化">
-<meta name="twitter:description" content="目前流行的js模块化规范有CommonJS、AMD、CMD以及ES6的模块系统 CommonJS—NodeJS根据CommonJS规范，一个单独的文件就是一个模块。每一个模块都是一个单独的作用域，也就是说，在该模块内部定义的变量，无法被其他模块读取，除非定义为global对象的属性。 ```Node.js```有四个重要的环境变量为模块化的实现提供支持：```module```、```export">
+<meta name="twitter:description" content="目前流行的js模块化规范有CommonJS、AMD、CMD以及ES6的模块系统 AMD—RequireJS ```require.config()```用来指定引用路径，```define()```用来定义模块，```require()```用来加载模块。 使用时要先在网页中引入```require.js```,设置```data-main```属性： ```&amp;lt;script src=&amp;quo">
     
     
         
@@ -94,7 +94,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CommonJS—NodeJS"><span class="toc-number">1.</span> <span class="toc-text">CommonJS—NodeJS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMD—SeaJS"><span class="toc-number">2.</span> <span class="toc-text">CMD—SeaJS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AMD与CMD"><span class="toc-number">3.</span> <span class="toc-text">AMD与CMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ES6模块机制："><span class="toc-number">4.</span> <span class="toc-text">ES6模块机制：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ES6与CommonJS区别"><span class="toc-number">5.</span> <span class="toc-text">ES6与CommonJS区别</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#AMD—RequireJS"><span class="toc-number">1.</span> <span class="toc-text">AMD—RequireJS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CMD—SeaJS"><span class="toc-number">2.</span> <span class="toc-text">CMD—SeaJS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AMD与CMD"><span class="toc-number">3.</span> <span class="toc-text">AMD与CMD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CommonJS—NodeJS"><span class="toc-number">4.</span> <span class="toc-text">CommonJS—NodeJS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ES6"><span class="toc-number">5.</span> <span class="toc-text">ES6</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CommonJS与ES6的循环引用"><span class="toc-number">5.1.</span> <span class="toc-text">CommonJS与ES6的循环引用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ES6与CommonJS"><span class="toc-number">6.</span> <span class="toc-text">ES6与CommonJS</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -129,26 +129,7 @@
 
   <div class="content" itemprop="articleBody">
     <p>目前流行的js模块化规范有CommonJS、AMD、CMD以及ES6的模块系统</p>
-<h2 id="CommonJS—NodeJS"><a href="#CommonJS—NodeJS" class="headerlink" title="CommonJS—NodeJS"></a>CommonJS—NodeJS</h2><p>根据<code>CommonJS</code>规范，一个单独的文件就是一个模块。每一个模块都是一个单独的作用域，也就是说，在该模块内部定义的变量，无法被其他模块读取，除非定义为<code>global</code>对象的属性。</p>
-<pre><code class="Node.js```是```CommonJS```规范的主要实践者，```CommonJS```用```同步```的方式加载模块。">```Node.js```有四个重要的环境变量为模块化的实现提供支持：```module```、```exports```、```require```、```global```。
-```module.exports```是当前模块对外输出的接口（不推荐直接用exports），把需要对外输出的内容放在该对象中。
-```require```用来加载模块
-
-commonJS用同步的方式加载模块。在服务端，模块文件都存在本地磁盘，读取非常快，所以这样做不会有问题。但是在浏览器端，限于网络原因，更合理的方案是使用异步加载。
-
-
-### exports和module.exports的关系
-它们之间的关系其实类似于这样：
-
-    var exports = module.exports
-    //所以，exports的本质还是module.exports,但是不能把要输出的值赋值给exports；
-
-    exports = {}；这样相当于修改了exports的指向。
-
-## AMD---RequireJS
-
-```RequireJS```在加载依赖模块时是异步加载，这样浏览器不会失去响应，同时它指定的回调函数，只有在前面的模块都加载成功后，才会运行，解决了依赖性的问题。
-
+<h3 id="AMD—RequireJS"><a href="#AMD—RequireJS" class="headerlink" title="AMD—RequireJS"></a>AMD—RequireJS</h3><pre><code class="RequireJS```在加载依赖模块时是异步加载，这样浏览器不会失去响应，同时它指定的回调函数，只有在前面的模块都加载成功后，才会运行，解决了依赖性的问题。">
 ```require.config()```用来指定引用路径，```define()```用来定义模块，```require()```用来加载模块。
 使用时要先在网页中引入```require.js```,设置```data-main```属性：
 ```&lt;script src=&quot;js/require.js&quot; data-main=&quot;js/main&quot;&gt;&lt;/script&gt;
@@ -158,7 +139,7 @@ commonJS用同步的方式加载模块。在服务端，模块文件都存在本
 <pre><code>require.config(
     baseUrl: &quot;js/lib&quot;,
   paths: {
-    &quot;jquery&quot;: &quot;jquery.min&quot;,  //实际路径为js/lib/jquery.min.js
+    &quot;jquery&quot;: &quot;jquery.min&quot;,  //实际路径为&#39;js/lib/jquery.min.js&#39;
     &quot;underscore&quot;: &quot;underscore.min&quot;,
   }
 )
@@ -171,7 +152,7 @@ commonJS用同步的方式加载模块。在服务端，模块文件都存在本
 
     return {}
 })
-</code></pre><h2 id="CMD—SeaJS"><a href="#CMD—SeaJS" class="headerlink" title="CMD—SeaJS"></a>CMD—SeaJS</h2><p><code>require.js</code>在申明依赖的模块时会在第一时间加载并执行模块内的代码。</p>
+</code></pre><h3 id="CMD—SeaJS"><a href="#CMD—SeaJS" class="headerlink" title="CMD—SeaJS"></a>CMD—SeaJS</h3><p><code>require.js</code>在申明依赖的模块时会在第一时间加载并执行模块内的代码。</p>
 <p>CMD是另一种js模块化方案，它与AMD很类似，不同点在于：AMD 推崇<code>依赖前置、提前执行</code>，CMD推崇<code>依赖就近、延迟执行</code>。</p>
 <p>定义模块：</p>
 <pre><code>//require 是一个方法，接受模块标识作为唯一参数，用来获取其他模块提供的接口：require(id)；
@@ -190,9 +171,15 @@ define(function(require, exports, module) {
 <pre><code>seajs.use([&#39;a&#39;],function(module_a){
 
 })
-</code></pre><h2 id="AMD与CMD"><a href="#AMD与CMD" class="headerlink" title="AMD与CMD"></a>AMD与CMD</h2><p>AMD和CMD最大的区别是对依赖模块的执行时机处理不同：<br>AMD与CMD在加载模块时都是异步的，只不过AMD依赖前置，JS可以方便知道依赖模块是谁，立即加载，而CMD就近依赖，需要先把模块变为字符串解析一遍才知道依赖了那些模块，然后再加载模块。</p>
+</code></pre><h3 id="AMD与CMD"><a href="#AMD与CMD" class="headerlink" title="AMD与CMD"></a>AMD与CMD</h3><p>AMD和CMD最大的区别是对依赖模块的执行时机处理不同：<br>AMD与CMD在加载模块时都是异步的，只不过AMD是<code>依赖前置</code>，JS可以方便知道依赖模块是谁，立即加载，而CMD是<code>就近依赖</code>，需要先把模块变为字符串解析一遍才知道依赖了那些模块，然后再加载模块。</p>
 <p>AMD在加载模块完成后就会执行该模块，所有模块都加载执行完后会进入require的回调函数，执行主逻辑，这样的效果就是依赖模块的执行顺序和书写顺序不一定一致，看网络速度，哪个先下载下来，哪个先执行，但是主逻辑一定在所有依赖加载完成后才执行。<br>CMD加载完某个依赖模块后并不执行，只是下载而已，在所有依赖模块加载完成后进入主逻辑，遇到require语句的时候才执行对应的模块，这样模块的执行顺序和书写顺序是完全一致的。</p>
-<h2 id="ES6模块机制："><a href="#ES6模块机制：" class="headerlink" title="ES6模块机制："></a>ES6模块机制：</h2><h2 id="ES6与CommonJS区别"><a href="#ES6与CommonJS区别" class="headerlink" title="ES6与CommonJS区别"></a>ES6与CommonJS区别</h2><p> CommonJS 模块是运行时加载，ES6 模块是编译时加载：</p>
+<h3 id="CommonJS—NodeJS"><a href="#CommonJS—NodeJS" class="headerlink" title="CommonJS—NodeJS"></a>CommonJS—NodeJS</h3><p>根据<code>CommonJS</code>规范，一个单独的文件就是一个模块。每一个模块都是一个单独的作用域，也就是说，在该模块内部定义的变量，无法被其他模块读取，除非定义为<code>global</code>对象的属性。<br><code>Node.js</code>是<code>CommonJS</code>规范的主要实践者，<code>CommonJS</code>用<code>同步</code>的方式加载模块。<br><code>Node.js</code>有四个重要的环境变量为模块化的实现提供支持：<code>module</code>、<code>exports</code>、<code>require</code>、<code>global</code>。</p>
+<p><code>module.exports</code>是当前模块对外输出的接口（不推荐直接用exports），把需要对外输出的内容放在该对象中。<code>require</code>用来加载模块。<code>global</code>是全局对象。</p>
+<p>在CommonJS中，引用模块时就会去执行对应的模块，然后从模块的<code>module.exports</code>中获得它的拷贝值。也就是说一旦输出一个值，模块内部的变化就影响不到这个值。(对于引用类型的值还是会有影响)。</p>
+<p>需要用到这个模块的时候，就会到exports属性上面取值。即使再次执行require命令，也不会再次执行该模块，而是到缓存之中取值。也就是说，CommonJS 模块无论加载多少次，都只会在第一次加载时运行一次，以后再加载，就返回第一次运行的结果，除非手动清除系统缓存。</p>
+<h3 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h3><p>ES6的模块加载机制与CommonJS不相同，在CommonJS中模块输出的是值的拷贝，在ES6中输出的是一个<code>动态只读引用</code>。<br>只读说明不可以修改引入变量的值。当模块遇到import命令时，就会生成一个只读引用。在脚本真正执行时，会根据这个只读引用，到被加载的那个模块里面去取值。<br>由于是动态引用，原始值发生变化，import加载的值也会发生变化。</p>
+<h4 id="CommonJS与ES6的循环引用"><a href="#CommonJS与ES6的循环引用" class="headerlink" title="CommonJS与ES6的循环引用"></a>CommonJS与ES6的循环引用</h4><p>CommonJS使用的是运行时加载，在发生循环引用时只能读取到当前已经执行完的部分。<br>ES6使用的是只读引用，在发生循环引用时并不会产生异常影响，只需要确保在使用到被加载对象时能够读取到正确的值就可以。</p>
+<h3 id="ES6与CommonJS"><a href="#ES6与CommonJS" class="headerlink" title="ES6与CommonJS"></a>ES6与CommonJS</h3><p> CommonJS 模块是运行时加载，ES6 模块是编译时加载：</p>
 <p><code>运行时加载</code>: CommonJS 模块就是对象；即在输入时是先加载整个模块，生成一个对象，然后再从这个对象上面读取方法，这种加载称为“运行时加载”。</p>
 <p><code>编译时加载</code>: ES6 模块不是对象，而是通过 export 命令显式指定输出的代码，import命令会被 JavaScript 引擎静态分析，在编译时就引入指定的模块代码，而不是加载整个模块，这种加载称为“编译时加载”。</p>
 <p><a href="https://www.cnblogs.com/unclekeith/archive/2017/10/17/7679503.html" target="_blank" rel="noopener">https://www.cnblogs.com/unclekeith/archive/2017/10/17/7679503.html</a></p>
@@ -218,7 +205,7 @@ define(function(require, exports, module) {
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CommonJS—NodeJS"><span class="toc-number">1.</span> <span class="toc-text">CommonJS—NodeJS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMD—SeaJS"><span class="toc-number">2.</span> <span class="toc-text">CMD—SeaJS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AMD与CMD"><span class="toc-number">3.</span> <span class="toc-text">AMD与CMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ES6模块机制："><span class="toc-number">4.</span> <span class="toc-text">ES6模块机制：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ES6与CommonJS区别"><span class="toc-number">5.</span> <span class="toc-text">ES6与CommonJS区别</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#AMD—RequireJS"><span class="toc-number">1.</span> <span class="toc-text">AMD—RequireJS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CMD—SeaJS"><span class="toc-number">2.</span> <span class="toc-text">CMD—SeaJS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AMD与CMD"><span class="toc-number">3.</span> <span class="toc-text">AMD与CMD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CommonJS—NodeJS"><span class="toc-number">4.</span> <span class="toc-text">CommonJS—NodeJS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ES6"><span class="toc-number">5.</span> <span class="toc-text">ES6</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CommonJS与ES6的循环引用"><span class="toc-number">5.1.</span> <span class="toc-text">CommonJS与ES6的循环引用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ES6与CommonJS"><span class="toc-number">6.</span> <span class="toc-text">ES6与CommonJS</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
