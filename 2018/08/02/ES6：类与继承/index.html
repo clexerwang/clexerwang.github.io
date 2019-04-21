@@ -6,17 +6,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="在Es6中新增了class关键字，用来表示类的声明，extends用来表示类的继承。 例如在React中就有类似的继承： class App extends React.Component{     constructor(){         super();         this.state = {             time: new Date().toLocalTimeStrin">
+    <meta name="description" content="@(JavaScript知识点) ##ES6：类与继承在Es6中新增了class关键字，用来表示类的声明，extends用来表示类的继承。 例如在React中就有类似的继承： class App extends React.Component{     constructor(){         super();         this.state = {             time:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES6：类与继承">
 <meta property="og:url" content="http://yoursite.com/2018/08/02/ES6：类与继承/index.html">
 <meta property="og:site_name" content="Clexer">
-<meta property="og:description" content="在Es6中新增了class关键字，用来表示类的声明，extends用来表示类的继承。 例如在React中就有类似的继承： class App extends React.Component{     constructor(){         super();         this.state = {             time: new Date().toLocalTimeStrin">
+<meta property="og:description" content="@(JavaScript知识点) ##ES6：类与继承在Es6中新增了class关键字，用来表示类的声明，extends用来表示类的继承。 例如在React中就有类似的继承： class App extends React.Component{     constructor(){         super();         this.state = {             time:">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-05T08:49:52.635Z">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006tNc79ly1g2aj2xv0n8j30z80fago5.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tNc79ly1g2aj4bjcltj30p00enq4u.jpg">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tNc79ly1g2aj5uscmcj30o00euwgh.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006tNc79ly1g2ajbn02a5j313k0pu78p.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006tNc79ly1g2ajr5mrhej30t80akjsw.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tNc79ly1g2ak3ohvakj30r80f241c.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tNc79ly1g2alk6budwj30zm06cjse.jpg">
+<meta property="og:updated_time" content="2019-04-21T15:34:51.350Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES6：类与继承">
-<meta name="twitter:description" content="在Es6中新增了class关键字，用来表示类的声明，extends用来表示类的继承。 例如在React中就有类似的继承： class App extends React.Component{     constructor(){         super();         this.state = {             time: new Date().toLocalTimeStrin">
+<meta name="twitter:description" content="@(JavaScript知识点) ##ES6：类与继承在Es6中新增了class关键字，用来表示类的声明，extends用来表示类的继承。 例如在React中就有类似的继承： class App extends React.Component{     constructor(){         super();         this.state = {             time:">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/006tNc79ly1g2aj2xv0n8j30z80fago5.jpg">
     
     
         
@@ -94,8 +102,8 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#静态成员"><span class="toc-number">1.</span> <span class="toc-text">静态成员</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#继承内建对象"><span class="toc-number">2.</span> <span class="toc-text">继承内建对象</span></a></li></ol>
-    </div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#静态成员"><span class="toc-number">1.</span> <span class="toc-text">静态成员</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#继承内建对象"><span class="toc-number">2.</span> <span class="toc-text">继承内建对象</span></a></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#ES5如何实现"><span class="toc-number"></span> <span class="toc-text">ES5如何实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#wrapNativeSuper"><span class="toc-number">1.</span> <span class="toc-text">_wrapNativeSuper</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#inherit"><span class="toc-number">2.</span> <span class="toc-text">_inherit</span></a></li></ol>
+    </li></div>
   </span>
 </div>
 
@@ -128,7 +136,8 @@
   
 
   <div class="content" itemprop="articleBody">
-    <p>在Es6中新增了<code>class</code>关键字，用来表示类的声明，<code>extends</code>用来表示类的继承。</p>
+    <p>@(JavaScript知识点)</p>
+<p>##ES6：类与继承<br>在Es6中新增了<code>class</code>关键字，用来表示类的声明，<code>extends</code>用来表示类的继承。</p>
 <p>例如在React中就有类似的继承：</p>
 <pre><code>class App extends React.Component{
     constructor(){
@@ -196,6 +205,42 @@
 })()
 </code></pre><h4 id="静态成员"><a href="#静态成员" class="headerlink" title="静态成员"></a>静态成员</h4><p>在Es6中，类的静态方法通过关键字<code>static</code>来设置。但是<code>static</code>不能用在构造函数前。同时对于父类的静态方法，子类也可以使用。</p>
 <h4 id="继承内建对象"><a href="#继承内建对象" class="headerlink" title="继承内建对象"></a>继承内建对象</h4><p>ES5中无法通过去继承内建对象，比如：Array，Date等。<br>是因为在ES5中，首先是使用子类的构造函数生成对象，再使用父类去修饰这个对象。而在ES6中是先使用父类的构造函数生成对象，再使用子类的构造函数去修改它，所以可以访问到父类的内建功能。</p>
+<p>先举个例子，按照上面的ES5继承方式，使用子类myDate继承内置类型Date后，如果要使用Date类型的方法，就会报错：<br><img src="https://ws1.sinaimg.cn/large/006tNc79ly1g2aj2xv0n8j30z80fago5.jpg" alt><br>具体的原因，按照查询的结果来看是因为在V8引擎内部的限制，如果调用对象的<code>[[Class]]</code>不是Date，则抛出错误：<br><img src="https://ws4.sinaimg.cn/large/006tNc79ly1g2aj4bjcltj30p00enq4u.jpg" alt></p>
+<p>那么，ES6中到底是是怎么做到的呢？我是想去通过babel转义后看一下他的实现方式。所以先看一下使用babel转义后的代码可不可以正常运行：</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1g2aj5uscmcj30o00euwgh.jpg" alt><br>啊，它成功了！现在看看它内部是怎么处理的。</p>
+<h3 id="ES5如何实现"><a href="#ES5如何实现" class="headerlink" title="ES5如何实现"></a>ES5如何实现</h3><p>先看转义后的功能代码：</p>
+<pre><code>var myDate =function (_Date) {
+  _inherits(myDate, _Date);
+
+  function myDate() {
+    _classCallCheck(this, myDate);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(myDate).call(this));
+  }
+
+  return myDate;
+}(_wrapNativeSuper(Date));
+
+var my = new myDate();
+my.getTime();
+</code></pre><p>转义后，myDate的构造函数是由一个立即执行函数返回的,父类构造函数<code>_Date</code>由<code>_wrapNativeSuper</code>处理后返回，所以先来看一下这个函数所做的事情：</p>
+<h4 id="wrapNativeSuper"><a href="#wrapNativeSuper" class="headerlink" title="_wrapNativeSuper"></a>_wrapNativeSuper</h4><p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1g2ajbn02a5j313k0pu78p.jpg" alt></p>
+<p>可以看到所做的就是让构造函数<code>Wrapper</code>使用原型式继承的方式继承了<code>Date</code>。然后让<code>Warpper.__proto__ = Date</code> 这一步是用来继承<code>Date</code>的静态方法。最后将<code>Warpper</code>函数返回。</p>
+<p>现在返回之前的部分，接着看那个立即执行函数的内部，执行了<code>_inherits(myDate, _Date);</code>，继续看<code>_inherits</code>：</p>
+<h4 id="inherit"><a href="#inherit" class="headerlink" title="_inherit"></a>_inherit</h4><p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1g2ajr5mrhej30t80akjsw.jpg" alt><br><code>subClass</code>就是构造函数<code>myDate</code>,<code>superClass</code>就是<code>Warpper</code>。所以，它又执行了一次原型式继承，同样让<code>myDate.__proto__ = Warpper</code>。</p>
+<p>在执行完<code>_inherit</code>以后就得到了处理后的<code>myDate</code>构造函数，现在就看一下在new一个myDate实例时发生了什么。</p>
+<pre><code>//检测函数是否是作为构造函数调用，如果不是就报错
+_classCallCheck(this, myDate);
+</code></pre><p>接着：</p>
+<pre><code>return _possibleConstructorReturn(this, _getPrototypeOf(myDate).call(this));
+</code></pre><p>先执行：</p>
+<pre><code>_getPrototypeOf(myDate)
+</code></pre><p>这一步获取了<code>myDate</code>的<code>__proto__</code>属性，也就是<code>Warpper</code>函数。</p>
+<p>接着执行：</p>
+<pre><code>Warpper.call(this); //this为myDate实例
+</code></pre><p>现在就可以去看一下<code>Warpper</code>内部的过程了，它的内部只有一句：</p>
+<pre><code>_construct(Date, arguments, _getPrototypeOf(this).constructor); //this为传入的myDate实例
+</code></pre><p><code>_constructor</code>函数的内部为：<br><img src="https://ws4.sinaimg.cn/large/006tNc79ly1g2ak3ohvakj30r80f241c.jpg" alt><br>这里<code>Parent</code>就是<code>Date</code>,<code>Class</code>是<code>myDate.prototype.constructor</code>也就是<code>myDate函数</code>。<br>所以内部所做的就是：emmm,用父类构造函数生成了实例，然后修改了实例的<code>__proto__</code>属性并返回。<br>最后一步，执行<code>_possibleConstructorReturn</code>,参数是一个<code>myDate</code>实例，一个<code>Date</code>实例。<br><img src="https://ws4.sinaimg.cn/large/006tNc79ly1g2alk6budwj30zm06cjse.jpg" alt><br>额，然后就直接返回了。。（感觉受到了欺骗，所以这就是整个过程吗？？）<br>总结：<br>    整个过程所做的就是:原型式继承，修改子类构造函数的<code>__proto__</code>从而继承父类的静态方法，在子类构造函数中先生成父类实例再修改实例的<code>__proto__</code>属性，最后再为实例添加方法。</p>
 
   </div>
 </article>
@@ -218,8 +263,8 @@
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#静态成员"><span class="toc-number">1.</span> <span class="toc-text">静态成员</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#继承内建对象"><span class="toc-number">2.</span> <span class="toc-text">继承内建对象</span></a></li></ol>
-    </div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#静态成员"><span class="toc-number">1.</span> <span class="toc-text">静态成员</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#继承内建对象"><span class="toc-number">2.</span> <span class="toc-text">继承内建对象</span></a></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#ES5如何实现"><span class="toc-number"></span> <span class="toc-text">ES5如何实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#wrapNativeSuper"><span class="toc-number">1.</span> <span class="toc-text">_wrapNativeSuper</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#inherit"><span class="toc-number">2.</span> <span class="toc-text">_inherit</span></a></li></ol>
+    </li></div>
 
     <div id="share-footer" style="display: none">
       <ul>
